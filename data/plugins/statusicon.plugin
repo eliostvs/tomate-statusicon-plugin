@@ -1,0 +1,9 @@
+[Core]
+Name = StatusIcon
+Module = statusicon_plugin
+
+[Documentation]
+Author = Elio Esteves Duarte
+Version = 0.3.0
+Website = https://github.com/eliostvs/tomate-statusicon-plugin
+Description = Shows session progress in the notification area

@@ -1,0 +1,3 @@
+[run]
+omit=yapsy*
+include=data/plugins/*.py
