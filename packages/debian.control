@@ -20,8 +20,8 @@ Depends: ${misc:Depends},
  python-gi,
  tomate-gtk (>= 0.3.0)
 Description: Tomate plugin that shows the session progress in the notification area
-.
-This package installs the library for Python 2.
+ .
+ This package installs the library for Python 2.
 
 Package: tomate-statusicon-plugin3
 Architecture: all
@@ -30,5 +30,5 @@ Depends: ${misc:Depends},
  python-gi,
  tomate-gtk (>= 0.3.0)
 Description: Tomate plugin that shows the session progress in the notification area
-.
-This package installs the library for Python 3.
+ .
+ This package installs the library for Python 3.
