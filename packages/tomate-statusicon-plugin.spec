@@ -74,8 +74,8 @@ fi
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
 %{_datadir}/icons/hicolor/*/*/*.*
-%{_datadir}/icons/Adaita/*/*/*.*
-%{_datadir}/icons/Adaita-Dark/*/*/*.*
+%{_datadir}/icons/Adaita/
+%{_datadir}/icons/Adaita-Dark/
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md
