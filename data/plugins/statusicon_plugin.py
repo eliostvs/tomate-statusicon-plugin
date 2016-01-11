@@ -31,11 +31,11 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         self.status_icon = self._build_status_icon(menu)
 
-        self.hide()
+        # self.hide()
 
     def _build_status_icon(self, menu):
         status_icon = Gtk.StatusIcon()
-        status_icon.set_from_icon_name('tomate-indicator')
+        status_icon.set_from_icon_name('tomate-idle')
         status_icon.set_title("StatusIcon")
         status_icon.connect("button-press-event", lambda icon, event: menu.popup(None, None, None, None, 0, Gtk.get_current_event_time()))
         status_icon.connect("popup-menu",
