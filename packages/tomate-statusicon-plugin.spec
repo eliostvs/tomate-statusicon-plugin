@@ -30,6 +30,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 
 BuildRequires: python-devel
 BuildRequires: python-setuptools
+BuildRequires: adwaita-icon-theme
 
 Requires: tomate-gtk >= 0.3.0
 
@@ -56,6 +57,7 @@ python setup.py install --prefix=%{_prefix} --root=%{buildroot}
 %endif
 %if 0%{?fedora}
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/bin/touch --no-create %{_datadir}/icons/Adwaita &>/dev/null || :
 %endif
 
 %postun
@@ -66,6 +68,7 @@ python setup.py install --prefix=%{_prefix} --root=%{buildroot}
 if [ $1 -eq 0 ] ; then
     /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/Adwaita &>/dev/null || :
 fi
 %endif
 
