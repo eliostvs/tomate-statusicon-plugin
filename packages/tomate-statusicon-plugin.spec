@@ -36,6 +36,7 @@ Requires: tomate-gtk >= 0.3.0
 %if 0%{?suse_version}
 BuildArchitectures: noarch
 BuildRequires: hicolor-icon-theme
+BuildRequires: adwaita-icon-theme
 %endif
 
 %description
