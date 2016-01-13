@@ -30,7 +30,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 
 BuildRequires: python-devel
 BuildRequires: python-setuptools
-BuildRequires: adwaita-icon-theme
 
 Requires: tomate-gtk >= 0.3.0
 
@@ -75,8 +74,7 @@ fi
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
 %{_datadir}/icons/hicolor/*/*/*.*
-$dir %{_datadir}/icons/Adwaita/*/*/*
-$dir %{_datadir}/icons/Adwaita-Dark/*/*/*
+%{_datadir}/icons/Adwaita/*/*/*.*
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md
