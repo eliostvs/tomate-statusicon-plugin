@@ -76,8 +76,9 @@ fi
 %defattr(-,root,root,-)
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
-%{_datadir}/icons/hicolor/*/*/*.*
-%{_datadir}/icons/Adwaita/*/*/*.*
+%dir %{_datadir}/icons/Adwaita/22x22/status
+%{_datadir}/icons/hicolor/
+%{_datadir}/icons/Adwaita/
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md
