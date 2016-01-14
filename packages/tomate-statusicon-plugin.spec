@@ -30,7 +30,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 
 BuildRequires: python-devel
 BuildRequires: python-setuptools
-BuildRequires: adwaita-icon-theme
 
 Requires: tomate-gtk >= 0.3.0
 
