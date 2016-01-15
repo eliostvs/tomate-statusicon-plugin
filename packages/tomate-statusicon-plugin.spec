@@ -76,8 +76,8 @@ fi
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
 %dir %{_datadir}/icons/Adwaita/22x22/status
-%{_datadir}/icons/hicolor/
-%{_datadir}/icons/Adwaita/
+%{_datadir}/icons/hicolor/*/*/*.*
+%{_datadir}/icons/Adwaita/*/*/*.*
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md
