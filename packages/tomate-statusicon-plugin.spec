@@ -30,14 +30,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 
 BuildRequires: python-devel
 BuildRequires: python-setuptools
-
-%if 0%{?suse_version} > 1132
 BuildRequires: adwaita-icon-theme
-%endif
-
-%if 0%{?fedora} > 20
-BuildRequires: adwaita-icon-theme
-%endif
 
 Requires: tomate-gtk >= 0.3.0
 
