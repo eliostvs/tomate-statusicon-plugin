@@ -31,6 +31,14 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 BuildRequires: python-devel
 BuildRequires: python-setuptools
 
+%if 0%{?suse_version} > 1132
+BuildRequires: adwaita-icon-theme
+%endif
+
+%if 0%{?fedora} > 20
+BuildRequires: adwaita-icon-theme
+%endif
+
 Requires: tomate-gtk >= 0.3.0
 
 %if 0%{?suse_version}
@@ -75,7 +83,6 @@ fi
 %defattr(-,root,root,-)
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
-%dir %{_datadir}/icons/Adwaita/22x22/status
 %{_datadir}/icons/hicolor/*/*/*.*
 %{_datadir}/icons/Adwaita/*/*/*.*
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
