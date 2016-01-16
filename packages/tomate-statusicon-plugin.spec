@@ -88,6 +88,8 @@ fi
 %{_datadir}/icons/Adwaita/*/*/*.*
 %if 0%{?suse_version} == 1310
 %dir %{_datadir}/icons/Adwaita/
+%dir %{_datadir}/icons/Adwaita/22x22/
+%dir %{_datadir}/icons/Adwaita/22x22/status
 %endif
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
