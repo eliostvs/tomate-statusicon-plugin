@@ -87,7 +87,7 @@ fi
 %{_datadir}/icons/hicolor/*/*/*.*
 %{_datadir}/icons/Adwaita/*/*/*.*
 %if 0%{?suse_version} == 1310
-%dir %{_datadir}/icons/Adwaita/22x2xx/status
+%dir %{_datadir}/icons/Adwaita/22x22/status
 %endif
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
