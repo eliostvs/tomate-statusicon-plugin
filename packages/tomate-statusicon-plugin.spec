@@ -32,7 +32,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 BuildRequires: python-devel
 BuildRequires: python-setuptools
 
-%if 0%{?suse_version} > 1131
+%if 0%{?suse_version} > 1132
 BuildRequires: adwaita-icon-theme
 %endif
 
