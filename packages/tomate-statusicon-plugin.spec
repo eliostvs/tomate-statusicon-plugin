@@ -14,6 +14,7 @@
 
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
+%global debug_package %{nil}
 
 %define real_name tomate
 %define module_name %{real_name}_statusicon_plugin
@@ -31,7 +32,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 BuildRequires: python-devel
 BuildRequires: python-setuptools
 
-%if 0%{?suse_version} > 1132
+%if 0%{?suse_version} > 1310
 BuildRequires: adwaita-icon-theme
 %endif
 
@@ -85,6 +86,11 @@ fi
 %{_datadir}/%{real_name}/plugins/
 %{_datadir}/icons/hicolor/*/*/*.*
 %{_datadir}/icons/Adwaita/*/*/*.*
+%if 0%{?suse_version} == 1310
+%dir %{_datadir}/icons/Adwaita/
+%dir %{_datadir}/icons/Adwaita/22x22/
+%dir %{_datadir}/icons/Adwaita/22x22/status
+%endif
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md
