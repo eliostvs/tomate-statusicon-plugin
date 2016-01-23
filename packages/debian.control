@@ -18,7 +18,7 @@ Architecture: all
 Depends: ${misc:Depends},
  python-all (>= 2.7),
  python-gi,
- tomate-gtk (>= 0.3.0)
+ tomate-gtk (>= 0.4.0)
 Description: Tomate plugin that shows the session progress in the notification area
  .
  This package installs the library for Python 2.
@@ -28,7 +28,7 @@ Architecture: all
 Depends: ${misc:Depends},
  python-all (>= 3.2),
  python-gi,
- tomate-gtk (>= 0.3.0)
+ tomate-gtk (>= 0.4.0)
 Description: Tomate plugin that shows the session progress in the notification area
  .
  This package installs the library for Python 3.

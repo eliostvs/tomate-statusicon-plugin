@@ -14,12 +14,13 @@
 
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
+%global debug_package %{nil}
 
 %define real_name tomate
 %define module_name %{real_name}_statusicon_plugin
 
 Name: %{real_name}-statusicon-plugin
-Version: 0.3.0
+Version: 0.1.0
 Release: 0
 License: GPL-3.0+
 Summary: Tomate statusicon plugin
@@ -31,7 +32,15 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-build
 BuildRequires: python-devel
 BuildRequires: python-setuptools
 
-Requires: tomate-gtk >= 0.3.0
+%if 0%{?suse_version} > 1310
+BuildRequires: adwaita-icon-theme
+%endif
+
+%if 0%{?fedora} > 20
+BuildRequires: adwaita-icon-theme
+%endif
+
+Requires: tomate-gtk >= 0.4.0
 
 %if 0%{?suse_version}
 BuildArchitectures: noarch
@@ -56,6 +65,7 @@ python setup.py install --prefix=%{_prefix} --root=%{buildroot}
 %endif
 %if 0%{?fedora}
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/bin/touch --no-create %{_datadir}/icons/Adwaita &>/dev/null || :
 %endif
 
 %postun
@@ -66,6 +76,7 @@ python setup.py install --prefix=%{_prefix} --root=%{buildroot}
 if [ $1 -eq 0 ] ; then
     /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/Adwaita &>/dev/null || :
 fi
 %endif
 
@@ -74,8 +85,12 @@ fi
 %dir %{_datadir}/%{real_name}/
 %{_datadir}/%{real_name}/plugins/
 %{_datadir}/icons/hicolor/*/*/*.*
-%{_datadir}/icons/ubuntu-mono-light/
-%{_datadir}/icons/ubuntu-mono-dark/
+%{_datadir}/icons/Adwaita/*/*/*.*
+%if 0%{?suse_version} == 1310
+%dir %{_datadir}/icons/Adwaita/
+%dir %{_datadir}/icons/Adwaita/22x22/
+%dir %{_datadir}/icons/Adwaita/22x22/status
+%endif
 %{python_sitelib}/%{module_name}-%{version}-*.egg-info/
 
 %doc AUTHORS COPYING README.md

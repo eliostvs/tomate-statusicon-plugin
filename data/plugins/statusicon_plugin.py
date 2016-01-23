@@ -26,21 +26,24 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         self.view = graph.get('tomate.view')
         self.config = graph.get('tomate.config')
 
-        menu = self._build_menu()
-        menu.show_all()
+        self.menu = self._build_menu()
+        self.menu.show_all()
 
-        self.status_icon = self._build_status_icon(menu)
+        self.status_icon = self._build_status_icon()
 
         self.hide()
 
-    def _build_status_icon(self, menu):
+    def _build_status_icon(self):
         status_icon = Gtk.StatusIcon()
-        status_icon.set_from_icon_name('tomate-indicator')
+        status_icon.set_from_icon_name('tomate-idle')
         status_icon.set_title("StatusIcon")
-        status_icon.connect("button-press-event", lambda icon, event: menu.popup(None, None, None, None, 0, Gtk.get_current_event_time()))
-        status_icon.connect("popup-menu",
-                                 lambda icon, button, time: menu.popup(None, None, None, None, button, time))
+        status_icon.connect("button-press-event", self._popup_menu)
+        status_icon.connect("popup-menu", self._popup_menu)
+
         return status_icon
+
+    def _popup_menu(self, statusicon, event_or_button, active_time=None):
+        self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     def _build_menu(self):
         menuitem = Gtk.MenuItem(_('Show'), visible=False)
