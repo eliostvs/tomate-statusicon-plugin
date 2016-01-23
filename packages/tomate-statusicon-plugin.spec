@@ -20,7 +20,7 @@
 %define module_name %{real_name}_statusicon_plugin
 
 Name: %{real_name}-statusicon-plugin
-Version: 0.3.0
+Version: 0.1.0
 Release: 0
 License: GPL-3.0+
 Summary: Tomate statusicon plugin
@@ -40,7 +40,7 @@ BuildRequires: adwaita-icon-theme
 BuildRequires: adwaita-icon-theme
 %endif
 
-Requires: tomate-gtk >= 0.3.0
+Requires: tomate-gtk >= 0.4.0
 
 %if 0%{?suse_version}
 BuildArchitectures: noarch
