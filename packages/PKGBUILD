@@ -16,6 +16,7 @@ options=(!emptydirs)
 source=("https://github.com/eliostvs/$pkgname/archive/$pkgver.tar.gz")
 md5sums=('')
 install=tomate-statusicon-plugin.install
+conflicts=('tomate-indicator-plugin')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"

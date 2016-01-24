@@ -16,4 +16,5 @@ Depends: ${misc:Depends},
  ${python:Depends},
  python-gi,
  tomate-gtk (>= 0.5.0)
+Conflicts: tomate-indicator-plugin
 Description: Tomate plugin that shows the session progress in the notification area
