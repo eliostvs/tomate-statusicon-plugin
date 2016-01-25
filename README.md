@@ -18,6 +18,10 @@ Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomat
 Changelog
 ---------
 
+### v0.2.0
+
+- Bugs fixed
+
 ### v0.1.0
 
 - First release
