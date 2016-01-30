@@ -20,7 +20,7 @@ Changelog
 
 ### v0.2.0
 
-- Bugs fixed
+- Remove linux package metadata
 
 ### v0.1.0
 
