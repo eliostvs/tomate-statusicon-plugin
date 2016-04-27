@@ -1,7 +1,7 @@
 Tomate Status Icon Plugin
 =======================
 
-Tomate is a timer for the Pomodoro Techinique. 
+Tomate is a timer for the Pomodoro Techinique.
 This plugin shows the progress of the session in the notification area.
 
 Installation
@@ -17,6 +17,11 @@ Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomat
 
 Changelog
 ---------
+
+### v0.3.0
+
+- Using menu from tomate-gtk
+- Using py.test
 
 ### v0.2.0
 

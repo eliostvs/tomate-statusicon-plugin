@@ -1,17 +1,15 @@
 from __future__ import unicode_literals
 
 import logging
-from locale import gettext as _
-
-from gi.repository import Gtk
-from wiring import implements
 
 import tomate.plugin
+from gi.repository import Gtk
 from tomate.constant import State
 from tomate.event import Events, on
 from tomate.graph import graph
-from tomate.utils import suppress_errors
+from tomate.utils import rounded_percent, suppress_errors
 from tomate.view import TrayIcon
+from wiring import implements
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +21,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def __init__(self):
         super(StatusIconPlugin, self).__init__()
 
-        self.view = graph.get('tomate.view')
-        self.config = graph.get('tomate.config')
-
-        self.menu = self._build_menu()
-        self.menu.show_all()
-
+        self.menu = graph.get('view.menu')
         self.status_icon = self._build_status_icon()
 
         self.hide()
@@ -45,18 +38,6 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def _popup_menu(self, statusicon, event_or_button, active_time=None):
         self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-    def _build_menu(self):
-        menuitem = Gtk.MenuItem(_('Show'), visible=False)
-        menuitem.connect('activate', self.on_show_menu_activate)
-        menu = Gtk.Menu(halign=Gtk.Align.CENTER)
-        menu.add(menuitem)
-
-        return menu
-
-    @suppress_errors
-    def on_show_menu_activate(self, widget=None):
-        return self.view.show()
-
     @suppress_errors
     def activate(self):
         super(StatusIconPlugin, self).activate()
@@ -68,15 +49,14 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         graph.unregister_provider(TrayIcon)
 
     @suppress_errors
-    @on(Events.View, [State.hiding])
+    @on(Events.Session, [State.started])
     def show(self, sener=None, **kwargs):
         self.status_icon.set_visible(True)
 
         logger.debug('Plugin status icon is showing')
 
     @suppress_errors
-    @on(Events.Session, [State.finished])
-    @on(Events.View, [State.showing])
+    @on(Events.Session, [State.finished, State.stopped])
     def hide(self, sender=None, **kwargs):
         self.status_icon.set_visible(False)
 
@@ -87,17 +67,12 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def update_icon(self, sender=None, **kwargs):
         percent = int(kwargs.get('time_ratio', 0) * 100)
 
-        if self.rounded_percent(percent) < 99:
+        if rounded_percent(percent) < 99:
             icon_name = self.icon_name_for(percent)
             self.status_icon.set_from_icon_name(icon_name)
 
             logger.debug('set icon %s', icon_name)
 
-    def rounded_percent(self, percent):
-        '''
-        The icons show 5% steps, so we have to round.
-        '''
-        return percent - percent % 5
-
-    def icon_name_for(self, percent):
-        return 'tomate-{0:02}'.format(self.rounded_percent(percent))
+    @staticmethod
+    def icon_name_for(percent):
+        return 'tomate-{0:02}'.format(rounded_percent(percent))
