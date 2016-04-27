@@ -99,3 +99,9 @@ def test_should_call_hide_when_timer_stopped(plugin):
     result = Events.Session.send(State.stopped)
 
     assert len(result) == 1
+
+
+def test_should_call_menu_pop(plugin):
+    plugin._popup_menu(None, None)
+
+    plugin.menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0L)

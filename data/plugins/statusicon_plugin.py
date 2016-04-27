@@ -36,7 +36,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         return status_icon
 
     def _popup_menu(self, statusicon, event_or_button, active_time=None):
-        self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     @suppress_errors
     def activate(self):
