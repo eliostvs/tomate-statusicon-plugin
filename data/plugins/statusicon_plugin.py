@@ -21,7 +21,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def __init__(self):
         super(StatusIconPlugin, self).__init__()
 
-        self.menu = graph.get('trayicon.menu')
+        self.menu = graph.get('view.menu')
         self.status_icon = self._build_status_icon()
 
         self.hide()

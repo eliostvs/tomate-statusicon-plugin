@@ -12,7 +12,7 @@ def setup_function(function):
     graph.providers.clear()
 
     graph.register_instance('tomate.view', Mock())
-    graph.register_instance('trayicon.menu', Mock())
+    graph.register_instance('view.menu', Mock())
 
     Events.Session.receivers.clear()
     Events.Timer.receivers.clear()
