@@ -22,18 +22,16 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         super(StatusIconPlugin, self).__init__()
 
         self.menu = graph.get('trayicon.menu')
-        self.status_icon = self._build_status_icon()
-
-        self.hide()
+        self.widget = self._build_status_icon()
 
     def _build_status_icon(self):
-        status_icon = Gtk.StatusIcon()
-        status_icon.set_from_icon_name('tomate-idle')
-        status_icon.set_title("StatusIcon")
-        status_icon.connect("button-press-event", self._popup_menu)
-        status_icon.connect("popup-menu", self._popup_menu)
+        widget = Gtk.StatusIcon(visible=False)
+        widget.set_from_icon_name('tomate-idle')
+        widget.set_title("StatusIcon")
+        widget.connect("button-press-event", self._popup_menu)
+        widget.connect("popup-menu", self._popup_menu)
 
-        return status_icon
+        return widget
 
     def _popup_menu(self, statusicon, event_or_button, active_time=None):
         self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
@@ -41,26 +39,30 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     @suppress_errors
     def activate(self):
         super(StatusIconPlugin, self).activate()
+
         graph.register_instance(TrayIcon, self)
         connect_events(self.menu)
+        self.show()
 
     @suppress_errors
     def deactivate(self):
         super(StatusIconPlugin, self).deactivate()
+
         graph.unregister_provider(TrayIcon)
         disconnect_events(self.menu)
+        self.hide()
 
     @suppress_errors
     @on(Events.Session, [State.started])
     def show(self, sener=None, **kwargs):
-        self.status_icon.set_visible(True)
+        self.widget.set_visible(True)
 
         logger.debug('Plugin status icon is showing')
 
     @suppress_errors
     @on(Events.Session, [State.finished, State.stopped])
     def hide(self, sender=None, **kwargs):
-        self.status_icon.set_visible(False)
+        self.widget.set_visible(False)
 
         logger.debug('Plugin status icon is hiding')
 
@@ -71,7 +73,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         if rounded_percent(percent) < 99:
             icon_name = self.icon_name_for(percent)
-            self.status_icon.set_from_icon_name(icon_name)
+            self.widget.set_from_icon_name(icon_name)
 
             logger.debug('set icon %s', icon_name)
 

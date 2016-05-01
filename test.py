@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import pytest
-from mock import Mock, patch, call
+from mock import Mock, patch
 from tomate.constant import State
 from tomate.event import Events
 from tomate.graph import graph
@@ -33,22 +33,22 @@ def plugin(StatusIcon):
 
 def test_should_update_icon_when_timer_changed(plugin):
     plugin.update_icon(time_ratio=0.5)
-    plugin.status_icon.set_from_icon_name.assert_called_with('tomate-50')
+    plugin.widget.set_from_icon_name.assert_called_with('tomate-50')
 
     plugin.update_icon(time_ratio=0.9)
-    plugin.status_icon.set_from_icon_name.assert_called_with('tomate-90')
+    plugin.widget.set_from_icon_name.assert_called_with('tomate-90')
 
 
-def test_should_show_status_icon(plugin):
+def test_should_show_widget_when_plugin_shows(plugin):
     plugin.show()
 
-    plugin.status_icon.set_visible.assert_has_calls([call(False), call(True)])
+    plugin.widget.set_visible.assert_called_once_with(True)
 
 
-def test_should_hide_status_icon(plugin):
+def test_should_hide_widget_when_plugin_hides(plugin):
     plugin.hide()
 
-    plugin.status_icon.set_visible.assert_has_calls([call(False), call(False)])
+    plugin.widget.set_visible.assert_called_once_with(False)
 
 
 def test_should_register_tray_icon_provider(plugin):
@@ -121,3 +121,21 @@ def test_should_disconnect_menu_events_when_plugin_deactivate(disconnect_events,
     plugin.deactivate()
 
     disconnect_events.assert_called_once_with(plugin.menu)
+
+
+def test_should_hide_widget_when_plugin_deactivate(plugin):
+    plugin.widget = Mock()
+    plugin.activate()
+    plugin.widget.reset_mock()
+
+    plugin.deactivate()
+
+    plugin.widget.set_visible.assert_called_once_with(False)
+
+
+def test_should_show_widget_when_plugin_activate(plugin):
+    plugin.widget = Mock()
+
+    plugin.activate()
+
+    plugin.widget.set_visible.assert_called_once_with(True)

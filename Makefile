@@ -9,6 +9,7 @@ DOCKER_IMAGE_NAME = $(AUTHOR)/$(PACKAGE)
 PYTHONPATH = PYTHONPATH=$(TOMATE_PATH):$(PLUGIN_PATH)
 PROJECT = home:eliostvs:tomate
 OBS_API_URL = https://api.opensuse.org:443/trigger/runservice?project=$(PROJECT)&package=$(PACKAGE)
+DEBUG = TOMATE_DEBUG=true
 
 submodule:
 	git submodule init
@@ -18,14 +19,14 @@ clean:
 	find . \( -iname "*.pyc" -o -iname "__pycache__" \) -print0 | xargs -0 rm -rf
 
 test: clean
-	$(PYTHONPATH) py.test test.py --cov-report term-missing --cov=$(PLUGIN_PATH) -v --flake8
+	$(DEBUG) $(PYTHONPATH) py.test test.py --cov-report term-missing --cov=$(PLUGIN_PATH) -v --flake8
 
 docker-clean:
 	docker rmi $(DOCKER_IMAGE_NAME) 2> /dev/null || echo $(DOCKER_IMAGE_NAME) not found!
 
 docker-build:
 	docker build -t $(DOCKER_IMAGE_NAME) .
-	
+
 docker-test:
 	docker run --rm -v $(PACKAGE_ROOT):/code $(DOCKER_IMAGE_NAME)
 
