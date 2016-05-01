@@ -5,7 +5,7 @@ import logging
 import tomate.plugin
 from gi.repository import Gtk
 from tomate.constant import State
-from tomate.event import Events, on
+from tomate.event import connect_events, disconnect_events, Events, on
 from tomate.graph import graph
 from tomate.utils import rounded_percent, suppress_errors
 from tomate.view import TrayIcon
@@ -42,11 +42,13 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def activate(self):
         super(StatusIconPlugin, self).activate()
         graph.register_instance(TrayIcon, self)
+        connect_events(self.menu)
 
     @suppress_errors
     def deactivate(self):
         super(StatusIconPlugin, self).deactivate()
         graph.unregister_provider(TrayIcon)
+        disconnect_events(self.menu)
 
     @suppress_errors
     @on(Events.Session, [State.started])

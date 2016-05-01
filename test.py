@@ -105,3 +105,19 @@ def test_should_call_menu_pop(plugin):
     plugin._popup_menu(None, None)
 
     plugin.menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0L)
+
+
+@patch('statusicon_plugin.connect_events')
+def test_should_connect_menu_events_when_plugin_activate(connect_events, plugin):
+    plugin.activate()
+
+    connect_events.assert_called_once_with(plugin.menu)
+
+
+@patch('statusicon_plugin.disconnect_events')
+def test_should_disconnect_menu_events_when_plugin_deactivate(disconnect_events, plugin):
+    plugin.activate()
+
+    plugin.deactivate()
+
+    disconnect_events.assert_called_once_with(plugin.menu)
