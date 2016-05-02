@@ -14,19 +14,19 @@ Bugs and Suggetions
 
 Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomate-statusicon-plugin/issues).
 
-Changelog
----------
+Change Log
+----------
 
-### v0.3.0
+### 0.3.0
 
 - Using menu from tomate-gtk
 - Using py.test
 
-### v0.2.0
+### 0.2.0
 
 - Remove linux package metadata
 
-### v0.1.0
+### 0.1.0
 
 - First release
 
