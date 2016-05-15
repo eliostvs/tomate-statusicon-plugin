@@ -11,7 +11,7 @@ from tomate.view import TrayIcon
 def setup_function(function):
     graph.providers.clear()
 
-    graph.register_instance('tomate.view', Mock())
+    graph.register_instance('tomate.session', Mock())
     graph.register_instance('trayicon.menu', Mock())
 
     Events.Session.receivers.clear()
@@ -21,6 +21,11 @@ def setup_function(function):
 
 def method_called(result):
     return result[0][0]
+
+
+@pytest.fixture()
+def session():
+    return graph.get('tomate.session')
 
 
 @pytest.fixture()
@@ -135,6 +140,22 @@ def test_should_hide_widget_when_plugin_deactivate(plugin):
 
 def test_should_show_widget_when_plugin_activate(plugin):
     plugin.widget = Mock()
+
+    plugin.activate()
+
+    plugin.widget.set_visible.assert_called_once_with(True)
+
+
+def test_plugin_should_hide_when_session_is_not_running(session, plugin):
+    session.is_running.return_value = False
+
+    plugin.activate()
+
+    plugin.widget.set_visible.assert_called_once_with(False)
+
+
+def test_plugin_should_show_when_session_is_running(session, plugin):
+    session.is_running.return_value = True
 
     plugin.activate()
 

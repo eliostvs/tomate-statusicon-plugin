@@ -22,19 +22,8 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         super(StatusIconPlugin, self).__init__()
 
         self.menu = graph.get('trayicon.menu')
+        self.session = graph.get('tomate.session')
         self.widget = self._build_status_icon()
-
-    def _build_status_icon(self):
-        widget = Gtk.StatusIcon(visible=False)
-        widget.set_from_icon_name('tomate-idle')
-        widget.set_title("StatusIcon")
-        widget.connect("button-press-event", self._popup_menu)
-        widget.connect("popup-menu", self._popup_menu)
-
-        return widget
-
-    def _popup_menu(self, statusicon, event_or_button, active_time=None):
-        self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     @suppress_errors
     def activate(self):
@@ -42,7 +31,8 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         graph.register_instance(TrayIcon, self)
         connect_events(self.menu)
-        self.show()
+
+        self._show_if_session_is_running()
 
     @suppress_errors
     def deactivate(self):
@@ -50,6 +40,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         graph.unregister_provider(TrayIcon)
         disconnect_events(self.menu)
+
         self.hide()
 
     @suppress_errors
@@ -72,11 +63,33 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         percent = int(kwargs.get('time_ratio', 0) * 100)
 
         if rounded_percent(percent) < 99:
-            icon_name = self.icon_name_for(percent)
+            icon_name = self._icon_name_for(percent)
             self.widget.set_from_icon_name(icon_name)
 
             logger.debug('set icon %s', icon_name)
 
+    def _build_status_icon(self):
+        widget = Gtk.StatusIcon(visible=False)
+        widget.set_from_icon_name('tomate-idle')
+        widget.set_title("StatusIcon")
+        widget.connect("button-press-event", self._popup_menu)
+        widget.connect("popup-menu", self._popup_menu)
+
+        return widget
+
+    def _popup_menu(self, statusicon, event_or_button, active_time=None):
+        self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+
     @staticmethod
-    def icon_name_for(percent):
+    def _icon_name_for(percent):
         return 'tomate-{0:02}'.format(rounded_percent(percent))
+
+    def _show_if_session_is_running(self):
+        if self.session.is_running():
+            self.show()
+
+        else:
+            self.hide()
+
+
