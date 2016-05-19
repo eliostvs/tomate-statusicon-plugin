@@ -23,7 +23,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         self.menu = graph.get('trayicon.menu')
         self.session = graph.get('tomate.session')
-        self.widget = self._build_status_icon()
+        self.widget = self.new_status_icon()
 
     @suppress_errors
     def activate(self):
@@ -54,6 +54,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     @on(Events.Session, [State.finished, State.stopped])
     def hide(self, sender=None, **kwargs):
         self.widget.set_visible(False)
+        self.widget.set_from_icon_name('tomate-idle')
 
         logger.debug('Plugin status icon is hiding')
 
@@ -68,7 +69,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
             logger.debug('set icon %s', icon_name)
 
-    def _build_status_icon(self):
+    def new_status_icon(self):
         widget = Gtk.StatusIcon(visible=False)
         widget.set_from_icon_name('tomate-idle')
         widget.set_title("StatusIcon")

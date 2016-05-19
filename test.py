@@ -146,6 +146,12 @@ def test_should_show_widget_when_plugin_activate(plugin):
     plugin.widget.set_visible.assert_called_once_with(True)
 
 
+def test_should_set_idle_icon_when_plugin_hides(plugin):
+    plugin.hide()
+
+    plugin.widget.set_from_icon_name.assert_called_with('tomate-idle')
+
+
 def test_plugin_should_hide_when_session_is_not_running(session, plugin):
     session.is_running.return_value = False
 
