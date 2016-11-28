@@ -1,5 +1,5 @@
 Tomate Status Icon Plugin
-=======================
+=========================
 
 Tomate is a timer for the Pomodoro Techinique.
 This plugin shows the timer countdown in the notification area.
@@ -9,13 +9,17 @@ Installation
 
 Go to [this page](https://github.com/eliostvs/tomate-gtk) for instructions.
 
-Bugs and Suggetions
--------------------
+Bugs and Suggestions
+--------------------
 
 Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomate-statusicon-plugin/issues).
 
 Change Log
 ----------
+
+### 0.4.0
+
+- Using new event api
 
 ### 0.3.0
 

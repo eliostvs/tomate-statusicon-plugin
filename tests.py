@@ -14,9 +14,9 @@ def setup_function(function):
     graph.register_instance('tomate.session', Mock())
     graph.register_instance('trayicon.menu', Mock())
 
-    Events.Session.receivers.clear()
-    Events.Timer.receivers.clear()
-    Events.View.receivers.clear()
+    Events['Session'].receivers.clear()
+    Events['Timer'].receivers.clear()
+    Events['View'].receivers.clear()
 
 
 def method_called(result):
@@ -74,7 +74,7 @@ def test_should_unregister_tray_icon_provider(plugin):
 def test_should_call_update_icon_when_time_changed(plugin):
     plugin.activate()
 
-    result = Events.Timer.send(State.changed)
+    result = Events['Timer'].send(State.changed)
 
     assert len(result) == 1
     assert plugin.update_icon == method_called(result)
@@ -83,7 +83,7 @@ def test_should_call_update_icon_when_time_changed(plugin):
 def test_should_call_show_when_session_started(plugin):
     plugin.activate()
 
-    result = Events.Session.send(State.started)
+    result = Events['Session'].send(State.started)
 
     assert len(result) == 1
     assert plugin.show == method_called(result)
@@ -92,7 +92,7 @@ def test_should_call_show_when_session_started(plugin):
 def test_should_call_hide_when_timer_finished(plugin):
     plugin.activate()
 
-    result = Events.Session.send(State.finished)
+    result = Events['Session'].send(State.finished)
 
     assert len(result) == 1
     assert plugin.hide == method_called(result)
@@ -101,7 +101,7 @@ def test_should_call_hide_when_timer_finished(plugin):
 def test_should_call_hide_when_timer_stopped(plugin):
     plugin.activate()
 
-    result = Events.Session.send(State.stopped)
+    result = Events['Session'].send(State.stopped)
 
     assert len(result) == 1
 

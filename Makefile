@@ -19,7 +19,10 @@ clean:
 	find . \( -iname "*.pyc" -o -iname "__pycache__" \) -print0 | xargs -0 rm -rf
 
 test: clean
-	$(DEBUG) $(PYTHONPATH) py.test test.py --cov-report term-missing --cov=$(PLUGIN_PATH) -v --flake8
+	$(PYTHONPATH) $(DEBUG) py.test tests.py --cov=$(PLUGIN_PATH)
+
+lint:
+	flake8
 
 docker-clean:
 	docker rmi $(DOCKER_IMAGE_NAME) 2> /dev/null || echo $(DOCKER_IMAGE_NAME) not found!
@@ -34,6 +37,9 @@ docker-all: docker-clean docker-build docker-test
 
 docker-enter:
 	docker run --rm -v $(PACKAGE_ROOT):/code -it --entrypoint="bash" $(DOCKER_IMAGE_NAME)
+
+docker-lint:
+	docker run --rm -v $(PACKAGE_ROOT):/code $(DOCKER_IMAGE_NAME) lint
 
 trigger-build:
 	curl -X POST -H "Authorization: Token $(TOKEN)" $(OBS_API_URL)
