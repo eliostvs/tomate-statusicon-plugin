@@ -43,14 +43,14 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         self.hide()
 
     @suppress_errors
-    @on(Events['Session'], [State.started])
+    @on(Events.Session, [State.started])
     def show(self, sener=None, **kwargs):
         self.widget.set_visible(True)
 
         logger.debug('Plugin status icon is showing')
 
     @suppress_errors
-    @on(Events['Session'], [State.finished, State.stopped])
+    @on(Events.Session, [State.finished, State.stopped])
     def hide(self, sender=None, **kwargs):
         self.widget.set_visible(False)
         self.widget.set_from_icon_name('tomate-idle')
@@ -58,7 +58,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
         logger.debug('Plugin status icon is hiding')
 
     @suppress_errors
-    @on(Events['Timer'], [State.changed])
+    @on(Events.Timer, [State.changed])
     def update_icon(self, sender=None, **kwargs):
         percent = int(kwargs.get('time_ratio', 0) * 100)
 
