@@ -5,41 +5,36 @@ TOMATE_PATH = $(PACKAGE_ROOT)/tomate
 DATA_PATH = $(PACKAGE_ROOT)/data
 PLUGIN_PATH = $(DATA_PATH)/plugins
 XDG_DATA_DIRS = XDG_DATA_DIRS=$(DATA_PATH)
-DOCKER_IMAGE_NAME = $(AUTHOR)/$(PACKAGE)
+DOCKER_IMAGE_NAME = $(AUTHOR)/tomate
 PYTHONPATH = PYTHONPATH=$(TOMATE_PATH):$(PLUGIN_PATH)
 PROJECT = home:eliostvs:tomate
 OBS_API_URL = https://api.opensuse.org:443/trigger/runservice?project=$(PROJECT)&package=$(PACKAGE)
 DEBUG = TOMATE_DEBUG=true
+WORK_DIR = /code
 
 submodule:
 	git submodule init
-	git submodule update
+	git submodule update --recursive --remote
 
 clean:
 	find . \( -iname "*.pyc" -o -iname "__pycache__" \) -print0 | xargs -0 rm -rf
 
 test: clean
-	$(PYTHONPATH) $(DEBUG) py.test tests.py --cov=$(PLUGIN_PATH)
-
-lint:
-	flake8
+	$(PYTHONPATH) $(DEBUG) py.test test_plugin.py --cov=$(PLUGIN_PATH)
 
 docker-clean:
 	docker rmi $(DOCKER_IMAGE_NAME) 2> /dev/null || echo $(DOCKER_IMAGE_NAME) not found!
 
-docker-build:
-	docker build -t $(DOCKER_IMAGE_NAME) .
+docker-pull:
+	docker pull $(DOCKER_IMAGE_NAME)
 
 docker-test:
-	docker run --rm -v $(PACKAGE_ROOT):/code $(DOCKER_IMAGE_NAME)
+	docker run --rm -v $(PACKAGE_ROOT):$(WORK_DIR) --workdir $(WORK_DIR) $(DOCKER_IMAGE_NAME)
 
 docker-all: docker-clean docker-build docker-test
 
 docker-enter:
-	docker run --rm -v $(PACKAGE_ROOT):/code -it --entrypoint="bash" $(DOCKER_IMAGE_NAME)
-
-docker-lint:
-	docker run --rm -v $(PACKAGE_ROOT):/code $(DOCKER_IMAGE_NAME) lint
+	docker run --rm -v $(PACKAGE_ROOT):$(WORK_DIR) --workdir $(WORK_DIR) -it --entrypoint="bash" $(DOCKER_IMAGE_NAME)
 
 trigger-build:
 	curl -X POST -H "Authorization: Token $(TOKEN)" $(OBS_API_URL)

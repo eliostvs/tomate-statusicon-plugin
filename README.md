@@ -19,7 +19,7 @@ Change Log
 
 ### 0.4.0
 
-- Using new event api
+- Python 3 only
 
 ### 0.3.0
 
