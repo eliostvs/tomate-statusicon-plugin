@@ -1,7 +1,7 @@
 Tomate Status Icon Plugin
 =========================
 
-Tomate is a timer for the Pomodoro Techinique.
+Tomate is a timer for the Pomodoro Technique.
 This plugin shows the timer countdown in the notification area.
 
 Installation
