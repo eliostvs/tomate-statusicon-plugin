@@ -31,7 +31,7 @@ docker-pull:
 docker-test:
 	docker run --rm -v $(PACKAGE_ROOT):$(WORK_DIR) --workdir $(WORK_DIR) $(DOCKER_IMAGE_NAME)
 
-docker-all: docker-clean docker-build docker-test
+docker-all: docker-clean docker-pull docker-test
 
 docker-enter:
 	docker run --rm -v $(PACKAGE_ROOT):$(WORK_DIR) --workdir $(WORK_DIR) -it --entrypoint="bash" $(DOCKER_IMAGE_NAME)
