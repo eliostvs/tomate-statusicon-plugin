@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import pytest
 from mock import Mock, patch
+
 from tomate.constant import State
 from tomate.event import Events
 from tomate.graph import graph

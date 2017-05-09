@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 @implements(TrayIcon)
 class StatusIconPlugin(tomate.plugin.Plugin):
-
     @suppress_errors
     def __init__(self):
         super(StatusIconPlugin, self).__init__()
@@ -81,7 +80,6 @@ class StatusIconPlugin(tomate.plugin.Plugin):
     def _popup_menu(self, statusicon, event_or_button, active_time=None):
         self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-
     @staticmethod
     def _icon_name_for(percent):
         return 'tomate-{0:02}'.format(rounded_percent(percent))
@@ -92,5 +90,3 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         else:
             self.hide()
-
-
