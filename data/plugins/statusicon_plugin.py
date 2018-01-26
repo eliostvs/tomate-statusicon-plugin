@@ -67,6 +67,12 @@ class StatusIconPlugin(tomate.plugin.Plugin):
             self.widget.set_from_icon_name(icon_name)
 
             logger.debug('set icon %s', icon_name)
+            
+    @suppress_errors
+    @on(Events.Session, [State.started])
+    def auto_hide_view(self, sender=None, **kwargs):
+        self.menu._on_hide_item_activate(None)
+        logger.debug("Automatically hide view")
 
     def new_status_icon(self):
         widget = Gtk.StatusIcon(visible=False)
