@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 import tomate.plugin
@@ -44,7 +42,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
     @suppress_errors
     @on(Events.Session, [State.started])
-    def show(self, sener=None, **kwargs):
+    def show(self, sender=None, **kwargs):
         self.widget.set_visible(True)
 
         logger.debug('Plugin status icon is showing')
@@ -77,7 +75,7 @@ class StatusIconPlugin(tomate.plugin.Plugin):
 
         return widget
 
-    def _popup_menu(self, statusicon, event_or_button, active_time=None):
+    def _popup_menu(self, widget, event_or_button, active_time=None):
         self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     @staticmethod
