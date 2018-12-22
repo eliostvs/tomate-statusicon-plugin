@@ -36,5 +36,11 @@ docker-all: docker-clean docker-pull docker-test
 docker-enter:
 	docker run --rm -v $(PACKAGE_ROOT):$(WORK_DIR) --workdir $(WORK_DIR) -it --entrypoint="bash" $(DOCKER_IMAGE_NAME)
 
+release-%:
+	bumpversion --verbose --commit $*
+	git flow release start $(CURRENT_VERSION)
+	git flow release finish -p $(CURRENT_VERSION)
+	git push --tags
+
 trigger-build:
 	curl -X POST -H "Authorization: Token $(TOKEN)" $(OBS_API_URL)
