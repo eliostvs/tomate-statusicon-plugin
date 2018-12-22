@@ -15,6 +15,10 @@ WORK_DIR = /code
 clean:
 	find . \( -iname "*.pyc" -o -iname "__pycache__" \) -print0 | xargs -0 rm -rf
 
+submodule:
+	git submodule init;
+	git submodule update;
+
 test: clean
 	$(PYTHONPATH) $(DEBUG) py.test test_plugin.py --cov=$(PLUGIN_PATH)
 
