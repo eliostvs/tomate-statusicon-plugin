@@ -14,8 +14,14 @@ Bugs and Suggestions
 
 Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomate-statusicon-plugin/issues).
 
-Change Log
-----------
+Changelog
+---------
+
+### [Unreleased]
+
+#### Changed
+
+- Using new session/task API
 
 ### 0.4.0
 
