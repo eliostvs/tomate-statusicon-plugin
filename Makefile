@@ -8,7 +8,8 @@ XDG_DATA_DIRS = XDG_DATA_DIRS=$(DATA_PATH)
 DOCKER_IMAGE_NAME = $(AUTHOR)/tomate
 PYTHONPATH = PYTHONPATH=$(TOMATE_PATH):$(PLUGIN_PATH)
 PROJECT = home:eliostvs:tomate
-OBS_API_URL = https://api.opensuse.org:443/trigger/runservice?project=$(PROJECT)&package=$(PACKAGE)
+OBS_API_URL = https://api.opensuse.org/trigger/runservice
+CURRENT_VERSION = `cat .bumpversion.cfg | grep current_version | awk '{print $$3}'`
 DEBUG = TOMATE_DEBUG=true
 WORK_DIR = /code
 
