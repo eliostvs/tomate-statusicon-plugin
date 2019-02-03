@@ -14,8 +14,14 @@ Bugs and Suggestions
 
 Bugs and suggestions should be reported [here](https://github.com/eliostvs/tomate-statusicon-plugin/issues).
 
-Change Log
-----------
+Changelog
+---------
+
+### [Unreleased]
+
+#### Changed
+
+- The timer, session and settings now emit a payload object instead of a dictionary
 
 ### 0.4.0
 

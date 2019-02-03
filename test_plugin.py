@@ -1,169 +1,148 @@
-from __future__ import unicode_literals
+from unittest.mock import Mock, patch
 
 import pytest
-from mock import Mock, patch
 
 from tomate.constant import State
 from tomate.event import Events
 from tomate.graph import graph
+from tomate.session import Session
+from tomate.timer import TimerPayload
 from tomate.view import TrayIcon
 
 
 def setup_function(function):
     graph.providers.clear()
 
-    graph.register_instance('tomate.session', Mock())
-    graph.register_instance('trayicon.menu', Mock())
+    graph.register_instance("tomate.session", Mock(spec=Session))
+    graph.register_instance("trayicon.menu", Mock())
 
     Events.Session.receivers.clear()
     Events.Timer.receivers.clear()
-    Events.View.receivers.clear()
 
 
-def method_called(result):
-    return result[0][0]
+@pytest.fixture
+def plugin(mocker):
+    with mocker.patch("statusicon_plugin.Gtk.StatusIcon"):
+        from statusicon_plugin import StatusIconPlugin
+
+        return StatusIconPlugin()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session():
-    return graph.get('tomate.session')
+    return graph.get("tomate.session")
 
 
-@pytest.fixture()
-@patch('statusicon_plugin.Gtk.StatusIcon')
-def plugin(StatusIcon):
-    from statusicon_plugin import StatusIconPlugin
-
-    return StatusIconPlugin()
-
-
-def test_should_update_icon_when_timer_changed(plugin):
-    plugin.update_icon(time_ratio=0.5)
-    plugin.widget.set_from_icon_name.assert_called_with('tomate-50')
-
-    plugin.update_icon(time_ratio=0.9)
-    plugin.widget.set_from_icon_name.assert_called_with('tomate-90')
-
-
-def test_should_show_widget_when_plugin_shows(plugin):
-    plugin.show()
-
-    plugin.widget.set_visible.assert_called_once_with(True)
-
-
-def test_should_hide_widget_when_plugin_hides(plugin):
-    plugin.hide()
-
-    plugin.widget.set_visible.assert_called_once_with(False)
-
-
-def test_should_register_tray_icon_provider(plugin):
+def test_should_update_icon_when_timer_changes(plugin):
+    # given
     plugin.activate()
+    payload = TimerPayload(time_left=5, duration=10)
 
-    assert TrayIcon in graph.providers.keys()
-    assert graph.get(TrayIcon) == plugin
+    # when
+    Events.Timer.send(State.changed, payload=payload)
 
-
-def test_should_unregister_tray_icon_provider(plugin):
-    graph.register_instance(TrayIcon, plugin)
-
-    plugin.deactivate()
-
-    assert TrayIcon not in graph.providers.keys()
+    # then
+    plugin.widget.set_from_icon_name.assert_called_with("tomate-50")
 
 
-def test_should_call_update_icon_when_time_changed(plugin):
-    plugin.activate()
-
-    result = Events.Timer.send(State.changed)
-
-    assert len(result) == 1
-    assert plugin.update_icon == method_called(result)
-
-
-def test_should_call_show_when_session_started(plugin):
-    plugin.activate()
-
-    result = Events.Session.send(State.started)
-
-    assert len(result) == 1
-    assert plugin.show == method_called(result)
-
-
-def test_should_call_hide_when_timer_finished(plugin):
-    plugin.activate()
-
-    result = Events.Session.send(State.finished)
-
-    assert len(result) == 1
-    assert plugin.hide == method_called(result)
-
-
-def test_should_call_hide_when_timer_stopped(plugin):
-    plugin.activate()
-
-    result = Events.Session.send(State.stopped)
-
-    assert len(result) == 1
-
-
-def test_should_call_menu_pop(plugin):
-    plugin._popup_menu(None, None)
-
-    plugin.menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
-
-
-@patch('statusicon_plugin.connect_events')
-def test_should_connect_menu_events_when_plugin_activate(connect_events, plugin):
-    plugin.activate()
-
-    connect_events.assert_called_once_with(plugin.menu)
-
-
-@patch('statusicon_plugin.disconnect_events')
-def test_should_disconnect_menu_events_when_plugin_deactivate(disconnect_events, plugin):
-    plugin.activate()
-
-    plugin.deactivate()
-
-    disconnect_events.assert_called_once_with(plugin.menu)
-
-
-def test_should_hide_widget_when_plugin_deactivate(plugin):
-    plugin.widget = Mock()
+def test_should_show_widget_when_session_starts(plugin):
+    # given
     plugin.activate()
     plugin.widget.reset_mock()
 
-    plugin.deactivate()
+    # when
+    Events.Session.send(State.started)
 
-    plugin.widget.set_visible.assert_called_once_with(False)
-
-
-def test_should_show_widget_when_plugin_activate(plugin):
-    plugin.widget = Mock()
-
-    plugin.activate()
-
+    # then
     plugin.widget.set_visible.assert_called_once_with(True)
 
 
-def test_should_set_idle_icon_when_plugin_hides(plugin):
-    plugin.hide()
+def test_should_hide_widget_when_session_ends(plugin):
+    for event_type in [State.finished, State.stopped]:
+        # given
+        plugin.activate()
+        plugin.widget.reset_mock()
 
-    plugin.widget.set_from_icon_name.assert_called_with('tomate-idle')
+        # when
+        Events.Session.send(event_type)
+
+        # then
+        plugin.widget.set_visible.assert_called_once_with(False)
+        plugin.widget.set_from_icon_name("tomate-idle")
 
 
-def test_plugin_should_hide_when_session_is_not_running(session, plugin):
-    session.is_running.return_value = False
+class TestActivePlugin:
+    def setup_method(self, method):
+        setup_function(method)
 
-    plugin.activate()
+    def test_should_register_tray_icon_provider(self, plugin):
+        plugin.activate()
 
-    plugin.widget.set_visible.assert_called_once_with(False)
+        assert TrayIcon in graph.providers.keys()
+        assert graph.get(TrayIcon) == plugin
+
+    def test_should_show_menu_when_session_is_running(self, session, plugin):
+        session.is_running.return_value = True
+
+        plugin.activate()
+
+        plugin.widget.set_visible.assert_called_once_with(True)
+
+    def test_should_hide_menu_when_session_is_not_running(self, session, plugin):
+        session.is_running.return_value = False
+
+        plugin.activate()
+
+        plugin.widget.set_visible.assert_called_once_with(False)
+
+    @patch("statusicon_plugin.connect_events")
+    def test_should_connect_menu_events(self, connect_events, plugin):
+        # when
+        plugin.activate()
+
+        # then
+        connect_events.assert_called_once_with(plugin.menu)
 
 
-def test_plugin_should_show_when_session_is_running(session, plugin):
-    session.is_running.return_value = True
+class TestDeactivatePlugin:
+    def setup_method(self, method):
+        setup_function(method)
 
-    plugin.activate()
+    def test_should_unregister_tray_icon_provider(self, plugin):
+        # given
+        graph.register_instance(TrayIcon, plugin)
+        plugin.activate()
 
-    plugin.widget.set_visible.assert_called_once_with(True)
+        # when
+        plugin.deactivate()
+
+        # then
+        assert TrayIcon not in graph.providers.keys()
+
+    def test_should_hide_widget_when_plugin_deactivate(self, plugin):
+        # given
+        plugin.activate()
+        plugin.widget.reset_mock()
+
+        # when
+        plugin.deactivate()
+
+        # then
+        plugin.widget.set_visible.assert_called_once_with(False)
+
+    @patch("statusicon_plugin.disconnect_events")
+    def test_should_disconnect_menu_events_when_plugin_deactivate(self, disconnect_events, plugin):
+        # given
+        plugin.activate()
+
+        # when
+        plugin.deactivate()
+
+        # then
+        disconnect_events.assert_called_once_with(plugin.menu)
+
+
+def test_should_call_menu_pop(plugin):
+    plugin._popup_menu(None, None, None)
+
+    plugin.menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
