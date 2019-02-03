@@ -19,6 +19,12 @@ Changelog
 
 ### [Unreleased]
 
+#### Fixed
+
+- Fix Travis-CI release script
+
+### 0.5.0
+
 #### Changed
 
 - The timer, session and settings now emit a payload object instead of a dictionary
