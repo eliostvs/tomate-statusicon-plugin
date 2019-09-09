@@ -2,15 +2,15 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from tomate.constant import State
-from tomate.event import Events
-from tomate.graph import graph
-from tomate.session import Session
-from tomate.timer import TimerPayload
-from tomate.view import TrayIcon
+from tomate.core import State
+from tomate.core.event import Events
+from tomate.core.graph import graph
+from tomate.core.session import Session
+from tomate.core.timer import TimerPayload
+from tomate.ui.widgets import TrayIcon
 
 
-def setup_function(function):
+def setup_function(fn):
     graph.providers.clear()
 
     graph.register_instance("tomate.session", Mock(spec=Session))
