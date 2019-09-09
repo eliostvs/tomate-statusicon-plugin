@@ -1,0 +1,4 @@
+[submodule "tomate"]
+	path = tomate
+	url = https://github.com/eliostvs/tomate-gtk
+	branch = develop
