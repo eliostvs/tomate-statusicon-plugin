@@ -2,11 +2,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from tomate.core import State
-from tomate.core.event import Events
-from tomate.core.graph import graph
-from tomate.core.session import Session
-from tomate.core.timer import TimerPayload
+from tomate.pomodoro import State
+from tomate.pomodoro.event import Events
+from tomate.pomodoro.graph import graph
+from tomate.pomodoro.session import Session
+from tomate.pomodoro.timer import TimerPayload
 from tomate.ui.widgets import TrayIcon
 
 

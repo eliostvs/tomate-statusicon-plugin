@@ -3,11 +3,11 @@ import logging
 from gi.repository import Gtk
 from wiring import implements
 
-from tomate.core import State
-from tomate.core.event import connect_events, disconnect_events, Events, on
-from tomate.core.graph import graph
-from tomate.core.plugin import Plugin, suppress_errors
-from tomate.core.timer import TimerPayload
+from tomate.pomodoro import State
+from tomate.pomodoro.event import connect_events, disconnect_events, Events, on
+from tomate.pomodoro.graph import graph
+from tomate.pomodoro.plugin import Plugin, suppress_errors
+from tomate.pomodoro.timer import TimerPayload
 from tomate.ui.widgets import TrayIcon
 
 logger = logging.getLogger(__name__)
