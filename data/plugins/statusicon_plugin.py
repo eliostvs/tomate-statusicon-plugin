@@ -7,7 +7,7 @@ from tomate.pomodoro import State
 from tomate.pomodoro.event import connect_events, disconnect_events, Events, on
 from tomate.pomodoro.graph import graph
 from tomate.pomodoro.plugin import Plugin, suppress_errors
-from tomate.pomodoro.timer import TimerPayload
+from tomate.pomodoro.timer import Payload as TimerPayload
 from tomate.ui.widgets import TrayIcon
 
 logger = logging.getLogger(__name__)
