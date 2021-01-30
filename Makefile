@@ -1,10 +1,7 @@
 .SILENT:
 
-DATAPATH     = XDG_DATA_DIRS=$(CURDIR)/data:/home/$(USER)/.local/share:/usr/local/share:/usr/share
-DEBUG 		 = TOMATE_DEBUG=true
-DOCKER_IMAGE = eliostvs/$(PACKAGE)
+DOCKER_IMAGE = eliostvs/tomate
 OBS_API_URL  = https://api.opensuse.org/trigger/runservice
-PACKAGE      = tomate
 PLUGINPATH   = $(CURDIR)/data/plugins
 PYTHONPATH   = PYTHONPATH=$(CURDIR)/tomate:$(PLUGINPATH)
 VERSION      = `cat .bumpversion.cfg | grep current_version | awk '{print $$3}'`
