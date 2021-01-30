@@ -20,7 +20,8 @@ submodule:
 	git submodule update
 
 test: clean
-	$(PYTHONPATH) $(DEBUG) py.test test_plugin.py --cov=$(PLUGINPATH)
+	echo "$(XDGPATHS) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)"
+	$(XDGPATHS) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)
 
 docker-clean:
 	docker rmi $(DOCKER_IMAGE) 2> /dev/null || echo $(DOCKER_IMAGE) not found!
