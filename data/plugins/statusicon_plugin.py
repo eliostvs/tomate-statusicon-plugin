@@ -21,7 +21,7 @@ class StatusIconPlugin(Plugin):
 
         self.menu = graph.get("trayicon.menu")
         self.session = graph.get("tomate.session")
-        self.widget = self.build_widget()
+        self.widget = self.create_widget()
 
     @suppress_errors
     def activate(self):
@@ -30,7 +30,13 @@ class StatusIconPlugin(Plugin):
         graph.register_instance(TrayIcon, self)
         connect_events(self.menu)
 
-        self._show_if_session_is_running()
+        self.show_if_session_is_running()
+
+    def show_if_session_is_running(self):
+        if self.session.is_running():
+            self.show()
+        else:
+            self.hide()
 
     @suppress_errors
     def deactivate(self):
@@ -59,30 +65,23 @@ class StatusIconPlugin(Plugin):
     @suppress_errors
     @on(Events.Timer, [State.changed])
     def update_icon(self, _, payload: TimerPayload):
-        icon_name = self._icon_name_for(payload.elapsed_percent)
+        icon_name = self.icon_name_for(payload.elapsed_percent)
         self.widget.set_from_icon_name(icon_name)
 
         logger.debug("action=set_icon name=%s", icon_name)
 
-    def build_widget(self):
+    @staticmethod
+    def icon_name_for(percent):
+        return "tomate-{0:.0f}".format(percent)
+
+    def create_widget(self):
         widget = Gtk.StatusIcon(visible=False)
         widget.set_from_icon_name("tomate-idle")
         widget.set_title("StatusIcon")
-        widget.connect("button-press-event", self._popup_menu)
-        widget.connect("popup-menu", self._popup_menu)
+        widget.connect("button-press-event", self.show_popup_menu)
+        widget.connect("popup-menu", self.show_popup_menu)
 
         return widget
 
-    def _popup_menu(self, widget, event_or_button, active_time):
+    def show_popup_menu(self, *_):
         self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-
-    @staticmethod
-    def _icon_name_for(percent):
-        return "tomate-{0:.0f}".format(percent)
-
-    def _show_if_session_is_running(self):
-        if self.session.is_running():
-            self.show()
-
-        else:
-            self.hide()
