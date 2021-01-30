@@ -8,7 +8,11 @@ PACKAGE      = tomate
 PLUGINPATH   = $(CURDIR)/data/plugins
 PYTHONPATH   = PYTHONPATH=$(CURDIR)/tomate:$(PLUGINPATH)
 VERSION      = `cat .bumpversion.cfg | grep current_version | awk '{print $$3}'`
-WORKDIR 	 = /code
+WORKDIR      = /code
+XDGPATHS     = XDG_DATA_HOME=$(CURDIR)
+
+format:
+	black data/plugins/
 
 clean:
 	find . \( -iname "*.pyc" -o -iname "__pycache__" \) -print0 | xargs -0 rm -rf
