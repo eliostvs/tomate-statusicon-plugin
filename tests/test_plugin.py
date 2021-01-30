@@ -32,7 +32,7 @@ def subject(session, menu):
     return StatusIconPlugin()
 
 
-def test_should_update_icon_when_timer_changes(subject):
+def test_change_icon_when_timer_change(subject):
     subject.activate()
 
     payload = TimerPayload(time_left=5, duration=10)
@@ -41,7 +41,7 @@ def test_should_update_icon_when_timer_changes(subject):
     assert subject.widget.get_icon_name() == "tomate-50"
 
 
-def test_should_show_widget_when_session_starts(subject):
+def test_show_when_session_start(subject):
     subject.activate()
     subject.widget.set_visible(False)
 
@@ -51,7 +51,7 @@ def test_should_show_widget_when_session_starts(subject):
 
 
 @pytest.mark.parametrize("event", [State.finished, State.stopped])
-def test_should_hide_widget_when_session_ends(event, subject):
+def test_hide_when_session_end(event, subject):
     subject.activate()
     subject.widget.set_visible(True)
 
@@ -62,13 +62,13 @@ def test_should_hide_widget_when_session_ends(event, subject):
 
 
 class TestActivePlugin:
-    def test_should_register_tray_icon_provider(self, subject):
+    def test_register_trayicon_provider(self, subject):
         subject.activate()
 
         assert TrayIcon in graph.providers.keys()
         assert graph.get(TrayIcon) == subject
 
-    def test_should_show_menu_when_session_is_running(self, session, subject):
+    def test_show_when_session_is_running(self, session, subject):
         session.is_running.return_value = True
         subject.widget.set_visible(False)
 
@@ -76,7 +76,7 @@ class TestActivePlugin:
 
         assert subject.widget.get_visible() is True
 
-    def test_should_hide_menu_when_session_is_not_running(self, session, subject):
+    def test_hide_when_session_is_not_running(self, session, subject):
         session.is_running.return_value = False
         subject.widget.set_visible(False)
 
@@ -84,7 +84,7 @@ class TestActivePlugin:
 
         assert subject.widget.get_visible() is False
 
-    def test_should_connect_menu_events(self, subject, menu, mocker):
+    def test_connect_menu_events(self, subject, menu, mocker):
         connect_events = mocker.patch("statusicon_plugin.connect_events")
 
         subject.activate()
@@ -93,7 +93,7 @@ class TestActivePlugin:
 
 
 class TestDeactivatePlugin:
-    def test_should_unregister_tray_icon_provider(self, subject):
+    def test_unregister_trayicon_provider(self, subject):
         graph.register_instance(TrayIcon, subject)
         subject.activate()
 
@@ -101,7 +101,7 @@ class TestDeactivatePlugin:
 
         assert TrayIcon not in graph.providers.keys()
 
-    def test_should_hide_widget_when_plugin_deactivate(self, subject):
+    def test_hide(self, subject):
         subject.activate()
         subject.widget.set_visible(True)
 
@@ -109,7 +109,7 @@ class TestDeactivatePlugin:
 
         assert subject.widget.get_visible() is False
 
-    def test_should_disconnect_menu_events_when_plugin_deactivate(self, subject, menu, mocker):
+    def test_disconnect_menu_events(self, subject, menu, mocker):
         disconnect_events = mocker.patch("statusicon_plugin.disconnect_events")
         subject.activate()
 
@@ -119,7 +119,7 @@ class TestDeactivatePlugin:
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
-def test_should_call_menu_pop(event, params, subject, menu):
+def test_show_menu_when_it_is_clicked(event, params, subject, menu):
     subject.widget.emit(event, *params)
 
     menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
