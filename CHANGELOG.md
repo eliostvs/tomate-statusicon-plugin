@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- new tomate API
+- New tomate API
 
 ## 0.6.0
 
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The timer, session and settings now emit a payload object instead of a dictionary
+- New tomate API
 
 ## 0.4.0
 
