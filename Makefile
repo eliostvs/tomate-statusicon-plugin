@@ -7,7 +7,7 @@ PLUGINPATH   = $(CURDIR)/data/plugins
 PYTHONPATH   = PYTHONPATH=$(CURDIR)/tomate:$(PLUGINPATH)
 VERSION      = `cat .bumpversion.cfg | grep current_version | awk '{print $$3}'`
 WORKDIR      = /code
-XDGPATHS     = XDG_DATA_HOME=$(CURDIR)/data
+XDGPATH      = XDG_DATA_HOME=$(CURDIR)/data
 
 format:
 	black data/plugins/
@@ -20,8 +20,8 @@ submodule:
 	git submodule update
 
 test: clean
-	echo "$(DEBUG) $(XDGPATHS) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)"
-	$(DEBUG) $(XDGPATHS) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)
+	echo "$(DEBUG) $(XDGPATH) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)"
+	$(DEBUG) $(XDGPATH) $(PYTHONPATH) $(ARGS) py.test $(PYTEST) --cov=$(PLUGINPATH)
 
 docker-clean:
 	docker rmi $(DOCKER_IMAGE) 2> /dev/null || echo $(DOCKER_IMAGE) not found!
