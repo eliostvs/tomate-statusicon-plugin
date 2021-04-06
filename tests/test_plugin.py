@@ -1,16 +1,22 @@
 import pytest
+from blinker import NamedSignal
 
-from tomate.pomodoro import State
+from gi.repository import Gtk
 from tomate.pomodoro.event import Events
 from tomate.pomodoro.graph import graph
 from tomate.pomodoro.session import Session
 from tomate.pomodoro.timer import Payload as TimerPayload
-from tomate.ui.widgets import TrayIcon
+from tomate.ui.widgets.systray import TrayIcon, Menu
+
+
+@pytest.fixture
+def bus():
+    return NamedSignal("Test")
 
 
 @pytest.fixture()
 def menu(mocker):
-    return mocker.Mock()
+    return mocker.Mock(spec=Menu, widget=mocker.Mock(spec=Gtk.Menu))
 
 
 @pytest.fixture
@@ -19,43 +25,40 @@ def session(mocker):
 
 
 @pytest.fixture
-def subject(session, menu):
+def subject(bus, menu, session):
     graph.providers.clear()
-
-    graph.register_instance("tomate.session", session)
+    graph.register_instance("tomate.bus", bus)
     graph.register_instance("trayicon.menu", menu)
-
-    Events.Session.receivers.clear()
-    Events.Timer.receivers.clear()
+    graph.register_instance("tomate.session", session)
 
     from statusicon_plugin import StatusIconPlugin
+
     return StatusIconPlugin()
 
 
-def test_change_icon_when_timer_change(subject):
+def test_change_icon_when_timer_change(bus, subject):
     subject.activate()
 
-    payload = TimerPayload(time_left=5, duration=10)
-    Events.Timer.send(State.changed, payload=payload)
+    bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=5, duration=10))
 
     assert subject.widget.get_icon_name() == "tomate-50"
 
 
-def test_show_when_session_start(subject):
+def test_show_when_session_start(bus, subject):
     subject.activate()
     subject.widget.set_visible(False)
 
-    Events.Session.send(State.started)
+    bus.send(Events.SESSION_START)
 
     assert subject.widget.get_visible() is True
 
 
-@pytest.mark.parametrize("event", [State.finished, State.stopped])
-def test_hide_when_session_end(event, subject):
+@pytest.mark.parametrize("event", [Events.SESSION_END, Events.SESSION_INTERRUPT])
+def test_hide_when_session_end(event, bus, subject):
     subject.activate()
     subject.widget.set_visible(True)
 
-    Events.Session.send(event)
+    bus.send(event)
 
     assert subject.widget.get_visible() is False
     assert subject.widget.get_icon_name() == "tomate-idle"
@@ -84,12 +87,10 @@ class TestActivePlugin:
 
         assert subject.widget.get_visible() is False
 
-    def test_connect_menu_events(self, subject, menu, mocker):
-        connect_events = mocker.patch("statusicon_plugin.connect_events")
-
+    def test_connect_menu_events(self, bus, menu, subject):
         subject.activate()
 
-        connect_events.assert_called_once_with(menu)
+        menu.connect.assert_called_once_with(bus)
 
 
 class TestDeactivatePlugin:
@@ -109,13 +110,12 @@ class TestDeactivatePlugin:
 
         assert subject.widget.get_visible() is False
 
-    def test_disconnect_menu_events(self, subject, menu, mocker):
-        disconnect_events = mocker.patch("statusicon_plugin.disconnect_events")
+    def test_disconnect_menu_events(self, bus, menu, subject):
         subject.activate()
 
         subject.deactivate()
 
-        disconnect_events.assert_called_once_with(menu)
+        menu.disconnect.assert_called_once_with(bus)
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
