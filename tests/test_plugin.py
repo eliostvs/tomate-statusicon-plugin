@@ -32,7 +32,6 @@ def subject(bus, menu, session):
     graph.register_instance("tomate.session", session)
 
     from statusicon_plugin import StatusIconPlugin
-
     return StatusIconPlugin()
 
 
