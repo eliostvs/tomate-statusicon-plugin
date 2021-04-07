@@ -7,19 +7,19 @@ from tomate.pomodoro.event import Events, on
 from tomate.pomodoro.graph import graph
 from tomate.pomodoro.plugin import Plugin, suppress_errors
 from tomate.pomodoro.timer import Payload as TimerPayload
-from tomate.ui.widgets import TrayIcon
+from tomate.ui import Systray
 
 logger = logging.getLogger(__name__)
 
 
-@implements(TrayIcon)
+@implements(Systray)
 class StatusIconPlugin(Plugin):
     @suppress_errors
     def __init__(self):
         super(StatusIconPlugin, self).__init__()
 
         self.bus = graph.get("tomate.bus")
-        self.menu = graph.get("trayicon.menu")
+        self.menu = graph.get("tomate.ui.systray.menu")
         self.session = graph.get("tomate.session")
         self.widget = self.create_widget()
 
@@ -27,7 +27,7 @@ class StatusIconPlugin(Plugin):
     def activate(self):
         super(StatusIconPlugin, self).activate()
 
-        graph.register_instance(TrayIcon, self)
+        graph.register_instance(Systray, self)
         self.menu.connect(self.bus)
         self.show_if_session_is_running()
 
@@ -41,7 +41,7 @@ class StatusIconPlugin(Plugin):
     def deactivate(self):
         super(StatusIconPlugin, self).deactivate()
 
-        graph.unregister_provider(TrayIcon)
+        graph.unregister_provider(Systray)
         self.menu.disconnect(self.bus)
         self.hide()
 

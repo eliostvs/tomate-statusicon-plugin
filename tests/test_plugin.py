@@ -1,12 +1,12 @@
 import pytest
 from blinker import NamedSignal
-
 from gi.repository import Gtk
+
 from tomate.pomodoro.event import Events
 from tomate.pomodoro.graph import graph
 from tomate.pomodoro.session import Session
 from tomate.pomodoro.timer import Payload as TimerPayload
-from tomate.ui.widgets.systray import TrayIcon, Menu
+from tomate.ui import Systray, SystrayMenu
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def bus():
 
 @pytest.fixture()
 def menu(mocker):
-    return mocker.Mock(spec=Menu, widget=mocker.Mock(spec=Gtk.Menu))
+    return mocker.Mock(spec=SystrayMenu, widget=mocker.Mock(spec=Gtk.Menu))
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def session(mocker):
 def subject(bus, menu, session):
     graph.providers.clear()
     graph.register_instance("tomate.bus", bus)
-    graph.register_instance("trayicon.menu", menu)
+    graph.register_instance("tomate.ui.systray.menu", menu)
     graph.register_instance("tomate.session", session)
 
     from statusicon_plugin import StatusIconPlugin
@@ -68,8 +68,8 @@ class TestActivePlugin:
     def test_register_trayicon_provider(self, subject):
         subject.activate()
 
-        assert TrayIcon in graph.providers.keys()
-        assert graph.get(TrayIcon) == subject
+        assert Systray in graph.providers.keys()
+        assert graph.get(Systray) == subject
 
     def test_show_when_session_is_running(self, session, subject):
         session.is_running.return_value = True
@@ -94,13 +94,13 @@ class TestActivePlugin:
 
 
 class TestDeactivatePlugin:
-    def test_unregister_trayicon_provider(self, subject):
-        graph.register_instance(TrayIcon, subject)
+    def test_unregister_systray_provider(self, subject):
+        graph.register_instance(Systray, subject)
         subject.activate()
 
         subject.deactivate()
 
-        assert TrayIcon not in graph.providers.keys()
+        assert Systray not in graph.providers.keys()
 
     def test_hide(self, subject):
         subject.activate()
