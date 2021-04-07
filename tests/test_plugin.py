@@ -35,7 +35,7 @@ def subject(bus, menu, session):
     return StatusIconPlugin()
 
 
-def test_change_icon_when_timer_change(bus, subject):
+def test_changes_icon_when_timer_change(bus, subject):
     subject.activate()
 
     bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=5, duration=10))
@@ -43,7 +43,7 @@ def test_change_icon_when_timer_change(bus, subject):
     assert subject.widget.get_icon_name() == "tomate-50"
 
 
-def test_show_when_session_start(bus, subject):
+def test_shows_when_session_start(bus, subject):
     subject.activate()
     subject.widget.set_visible(False)
 
@@ -53,7 +53,7 @@ def test_show_when_session_start(bus, subject):
 
 
 @pytest.mark.parametrize("event", [Events.SESSION_END, Events.SESSION_INTERRUPT])
-def test_hide_when_session_end(event, bus, subject):
+def test_hides_when_session_end(event, bus, subject):
     subject.activate()
     subject.widget.set_visible(True)
 
@@ -64,13 +64,13 @@ def test_hide_when_session_end(event, bus, subject):
 
 
 class TestActivePlugin:
-    def test_register_trayicon_provider(self, subject):
+    def test_registers_systray_provider(self, subject):
         subject.activate()
 
         assert Systray in graph.providers.keys()
         assert graph.get(Systray) == subject
 
-    def test_show_when_session_is_running(self, session, subject):
+    def test_shows_when_session_is_running(self, session, subject):
         session.is_running.return_value = True
         subject.widget.set_visible(False)
 
@@ -78,7 +78,7 @@ class TestActivePlugin:
 
         assert subject.widget.get_visible() is True
 
-    def test_hide_when_session_is_not_running(self, session, subject):
+    def test_hides_when_session_is_not_running(self, session, subject):
         session.is_running.return_value = False
         subject.widget.set_visible(False)
 
@@ -93,7 +93,7 @@ class TestActivePlugin:
 
 
 class TestDeactivatePlugin:
-    def test_unregister_systray_provider(self, subject):
+    def test_unregisters_systray_provider(self, subject):
         graph.register_instance(Systray, subject)
         subject.activate()
 
@@ -109,7 +109,7 @@ class TestDeactivatePlugin:
 
         assert subject.widget.get_visible() is False
 
-    def test_disconnect_menu_events(self, bus, menu, subject):
+    def test_disconnects_menu_events(self, bus, menu, subject):
         subject.activate()
 
         subject.deactivate()
@@ -118,7 +118,7 @@ class TestDeactivatePlugin:
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
-def test_show_menu_when_it_is_clicked(event, params, subject, menu):
+def test_shows_menu_when_clicked(event, params, subject, menu):
     subject.widget.emit(event, *params)
 
     menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
