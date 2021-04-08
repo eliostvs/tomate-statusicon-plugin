@@ -23,7 +23,7 @@ class StatusIconPlugin(plugin.Plugin):
         self.bus = graph.get("tomate.bus")
         self.menu = graph.get("tomate.ui.systray.menu")
         self.session = graph.get("tomate.session")
-        self.widget = self.create_widget()
+        self.status_icon = self.create_widget()
 
     @suppress_errors
     def activate(self):
@@ -47,25 +47,25 @@ class StatusIconPlugin(plugin.Plugin):
     @on(Events.SESSION_START)
     def show(self, *_, **__):
         logger.debug("action=show")
-        self.widget.set_visible(True)
+        self.status_icon.set_visible(True)
 
     @suppress_errors
     @on(Events.SESSION_END, Events.SESSION_INTERRUPT)
     def hide(self, *_, **__):
         logger.debug("action=hide")
-        self.widget.set_visible(False)
-        self.widget.set_from_icon_name("tomate-idle")
+        self.status_icon.set_visible(False)
+        self.status_icon.set_from_icon_name("tomate-idle")
 
     @suppress_errors
     @on(Events.TIMER_UPDATE)
     def update_icon(self, _, payload: TimerPayload):
         icon_name = self.icon_name_for(payload.elapsed_percent)
-        self.widget.set_from_icon_name(icon_name)
+        self.status_icon.set_from_icon_name(icon_name)
         logger.debug("action=set_icon name=%s", icon_name)
 
     @staticmethod
     def icon_name_for(percent):
-        return "tomate-{0:.0f}".format(percent)
+        return "tomate-{:02.0f}".format(percent)
 
     def create_widget(self):
         widget = Gtk.StatusIcon(visible=False)

@@ -32,35 +32,60 @@ def subject(bus, menu, session):
     graph.register_instance("tomate.session", session)
 
     from statusicon_plugin import StatusIconPlugin
+
     return StatusIconPlugin()
 
 
-def test_changes_icon_when_timer_change(bus, subject):
+@pytest.mark.parametrize(
+    "time_left,duration,icon_name",
+    [
+        (100, 100, "tomate-00"),
+        (95, 100, "tomate-05"),
+        (90, 100, "tomate-10"),
+        (85, 100, "tomate-15"),
+        (80, 100, "tomate-20"),
+        (75, 100, "tomate-25"),
+        (70, 100, "tomate-30"),
+        (65, 100, "tomate-35"),
+        (60, 100, "tomate-40"),
+        (55, 100, "tomate-45"),
+        (50, 100, "tomate-50"),
+        (45, 100, "tomate-55"),
+        (40, 100, "tomate-60"),
+        (35, 100, "tomate-65"),
+        (30, 100, "tomate-70"),
+        (25, 100, "tomate-75"),
+        (20, 100, "tomate-80"),
+        (10, 100, "tomate-90"),
+        (5, 100, "tomate-95"),
+    ],
+)
+def test_changes_icon_when_timer_change(time_left, duration, icon_name, bus, subject):
     subject.activate()
 
-    bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=5, duration=10))
+    bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=time_left, duration=duration))
 
-    assert subject.widget.get_icon_name() == "tomate-50"
+    assert subject.status_icon.get_icon_name() == icon_name
 
 
 def test_shows_when_session_start(bus, subject):
     subject.activate()
-    subject.widget.set_visible(False)
+    subject.status_icon.set_visible(False)
 
     bus.send(Events.SESSION_START)
 
-    assert subject.widget.get_visible() is True
+    assert subject.status_icon.get_visible() is True
 
 
 @pytest.mark.parametrize("event", [Events.SESSION_END, Events.SESSION_INTERRUPT])
 def test_hides_when_session_end(event, bus, subject):
     subject.activate()
-    subject.widget.set_visible(True)
+    subject.status_icon.set_visible(True)
 
     bus.send(event)
 
-    assert subject.widget.get_visible() is False
-    assert subject.widget.get_icon_name() == "tomate-idle"
+    assert subject.status_icon.get_visible() is False
+    assert subject.status_icon.get_icon_name() == "tomate-idle"
 
 
 class TestActivePlugin:
@@ -72,19 +97,19 @@ class TestActivePlugin:
 
     def test_shows_when_session_is_running(self, session, subject):
         session.is_running.return_value = True
-        subject.widget.set_visible(False)
+        subject.status_icon.set_visible(False)
 
         subject.activate()
 
-        assert subject.widget.get_visible() is True
+        assert subject.status_icon.get_visible() is True
 
     def test_hides_when_session_is_not_running(self, session, subject):
         session.is_running.return_value = False
-        subject.widget.set_visible(False)
+        subject.status_icon.set_visible(False)
 
         subject.activate()
 
-        assert subject.widget.get_visible() is False
+        assert subject.status_icon.get_visible() is False
 
     def test_connect_menu_events(self, bus, menu, subject):
         subject.activate()
@@ -103,11 +128,11 @@ class TestDeactivatePlugin:
 
     def test_hide(self, subject):
         subject.activate()
-        subject.widget.set_visible(True)
+        subject.status_icon.set_visible(True)
 
         subject.deactivate()
 
-        assert subject.widget.get_visible() is False
+        assert subject.status_icon.get_visible() is False
 
     def test_disconnects_menu_events(self, bus, menu, subject):
         subject.activate()
@@ -119,6 +144,6 @@ class TestDeactivatePlugin:
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
 def test_shows_menu_when_clicked(event, params, subject, menu):
-    subject.widget.emit(event, *params)
+    subject.status_icon.emit(event, *params)
 
     menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
