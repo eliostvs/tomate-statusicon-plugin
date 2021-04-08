@@ -6,17 +6,17 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
+import tomate.pomodoro.plugin as plugin
 from tomate.pomodoro.event import Events, on
 from tomate.pomodoro.graph import graph
-from tomate.pomodoro.plugin import Plugin, suppress_errors
+from tomate.pomodoro.plugin import suppress_errors
 from tomate.pomodoro.timer import Payload as TimerPayload
 from tomate.ui import Systray
 
 logger = logging.getLogger(__name__)
 
 
-@implements(Systray)
-class StatusIconPlugin(Plugin):
+class StatusIconPlugin(plugin.Plugin):
     @suppress_errors
     def __init__(self):
         super().__init__()
