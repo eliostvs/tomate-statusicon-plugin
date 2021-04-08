@@ -75,7 +75,6 @@ class StatusIconPlugin(Plugin):
         widget.set_title("StatusIcon")
         widget.connect("button-press-event", self.show_popup_menu)
         widget.connect("popup-menu", self.show_popup_menu)
-
         return widget
 
     def show_popup_menu(self, *_):
