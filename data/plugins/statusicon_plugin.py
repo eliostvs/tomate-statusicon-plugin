@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 class StatusIconPlugin(Plugin):
     @suppress_errors
     def __init__(self):
-        super(StatusIconPlugin, self).__init__()
-
+        super().__init__()
         self.bus = graph.get("tomate.bus")
         self.menu = graph.get("tomate.ui.systray.menu")
         self.session = graph.get("tomate.session")
@@ -29,8 +28,7 @@ class StatusIconPlugin(Plugin):
 
     @suppress_errors
     def activate(self):
-        super(StatusIconPlugin, self).activate()
-
+        super().activate()
         graph.register_instance(Systray, self)
         self.menu.connect(self.bus)
         self.show_if_session_is_running()
@@ -43,8 +41,7 @@ class StatusIconPlugin(Plugin):
 
     @suppress_errors
     def deactivate(self):
-        super(StatusIconPlugin, self).deactivate()
-
+        super().deactivate()
         graph.unregister_provider(Systray)
         self.menu.disconnect(self.bus)
         self.hide()
