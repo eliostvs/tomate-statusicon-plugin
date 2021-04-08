@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Plugin manager was not loading the plugin
 - Choosing wrong icon in the beginning of a session
-- Using new tomate event API
+- new tomate event API
 
 ## 0.6.0
 
