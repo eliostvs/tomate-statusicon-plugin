@@ -5,7 +5,6 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from wiring import implements
 
 from tomate.pomodoro.event import Events, on
 from tomate.pomodoro.graph import graph
@@ -31,9 +30,7 @@ class StatusIconPlugin(Plugin):
         super().activate()
         graph.register_instance(Systray, self)
         self.menu.connect(self.bus)
-        self.show_if_session_is_running()
 
-    def show_if_session_is_running(self):
         if self.session.is_running():
             self.show()
         else:
