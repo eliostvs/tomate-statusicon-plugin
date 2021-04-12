@@ -1,3 +1,7 @@
+ifeq ($(origin .RECIPEPREFIX), undefined)
+	$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
+endif
+
 .DELETE_ON_ERROR:
 .ONESHELL:
 .SHELLFLAGS   := -eu -o pipefail -c
@@ -14,10 +18,6 @@ PYTHONPATH   = PYTHONPATH=$(CURDIR)/tomate:$(PLUGINPATH)
 VERSION      = `cat .bumpversion.cfg | grep current_version | awk '{print $$3}'`
 WORKDIR      = /code
 XDGPATH      = XDG_DATA_HOME=$(CURDIR)/data
-
-ifeq ($(origin .RECIPEPREFIX), undefined)
-	$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
-endif
 
 ifeq ($(shell which xvfb-run 1> /dev/null && echo yes),yes)
 	ARGS = xvfb-run -a
