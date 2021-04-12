@@ -19,6 +19,12 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 	$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
 endif
 
+ifeq ($(shell which xvfb-run 1> /dev/null && echo yes),yes)
+	ARGS = xvfb-run -a
+else
+	ARGS ?=
+endif
+
 .PHONY: format
 format:
 	black data/plugins/ tests
