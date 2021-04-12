@@ -1,20 +1,16 @@
 import pytest
-from blinker import NamedSignal
 from gi.repository import Gtk
 
-from tomate.pomodoro.event import Events
-from tomate.pomodoro.graph import graph
-from tomate.pomodoro.session import Session
-from tomate.pomodoro.timer import Payload as TimerPayload
+from tomate.pomodoro import Bus, Events, Session, TimerPayload, graph
 from tomate.ui import Systray, SystrayMenu
 
 
 @pytest.fixture
-def bus():
-    return NamedSignal("Test")
+def bus() -> Bus:
+    return Bus()
 
 
-@pytest.fixture()
+@pytest.fixture
 def menu(mocker):
     return mocker.Mock(spec=SystrayMenu, widget=mocker.Mock(spec=Gtk.Menu))
 
@@ -25,15 +21,17 @@ def session(mocker):
 
 
 @pytest.fixture
-def subject(bus, menu, session):
+def plugin(bus, menu, session):
+    from statusicon_plugin import StatusIconPlugin
+
     graph.providers.clear()
     graph.register_instance("tomate.bus", bus)
     graph.register_instance("tomate.ui.systray.menu", menu)
     graph.register_instance("tomate.session", session)
 
-    from statusicon_plugin import StatusIconPlugin
-
-    return StatusIconPlugin()
+    instance = StatusIconPlugin()
+    instance.connect(bus)
+    return instance
 
 
 @pytest.mark.parametrize(
@@ -60,90 +58,86 @@ def subject(bus, menu, session):
         (5, 100, "tomate-95"),
     ],
 )
-def test_changes_icon_when_timer_change(time_left, duration, icon_name, bus, subject):
-    subject.activate()
+def test_changes_icon_when_timer_change(time_left, duration, icon_name, bus, plugin):
+    plugin.activate()
 
     bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=time_left, duration=duration))
 
-    assert subject.status_icon.get_icon_name() == icon_name
+    assert plugin.status_icon.props.icon_name == icon_name
 
 
-def test_shows_when_session_start(bus, subject):
-    subject.activate()
-    subject.status_icon.set_visible(False)
+def test_shows_when_session_start(bus, plugin):
+    plugin.activate()
+    plugin.status_icon.props.visible = False
 
     bus.send(Events.SESSION_START)
 
-    assert subject.status_icon.get_visible() is True
+    assert plugin.status_icon.props.visible is True
 
 
 @pytest.mark.parametrize("event", [Events.SESSION_END, Events.SESSION_INTERRUPT])
-def test_hides_when_session_end(event, bus, subject):
-    subject.activate()
-    subject.status_icon.set_visible(True)
+def test_hides_when_session_end(event, bus, plugin):
+    plugin.activate()
+    plugin.status_icon.props.visible = True
 
     bus.send(event)
 
-    assert subject.status_icon.get_visible() is False
-    assert subject.status_icon.get_icon_name() == "tomate-idle"
+    assert plugin.status_icon.props.visible is False
+    assert plugin.status_icon.props.icon_name == "tomate-idle"
 
 
 class TestActivePlugin:
-    def test_registers_systray_provider(self, subject):
-        subject.activate()
+    def test_registers_systray_provider(self, plugin):
+        plugin.activate()
 
         assert Systray in graph.providers.keys()
-        assert graph.get(Systray) == subject
+        assert graph.get(Systray) == plugin
 
-    def test_shows_when_session_is_running(self, session, subject):
+    def test_shows_when_session_is_running(self, session, plugin):
         session.is_running.return_value = True
-        subject.status_icon.set_visible(False)
+        plugin.status_icon.props.visible = False
 
-        subject.activate()
+        plugin.activate()
 
-        assert subject.status_icon.get_visible() is True
+        assert plugin.status_icon.props.visible is True
 
-    def test_hides_when_session_is_not_running(self, session, subject):
+    def test_hides_when_session_is_not_running(self, session, plugin):
         session.is_running.return_value = False
-        subject.status_icon.set_visible(False)
+        plugin.status_icon.props.visible = False
 
-        subject.activate()
+        plugin.activate()
 
-        assert subject.status_icon.get_visible() is False
+        assert plugin.status_icon.props.visible is False
 
-    def test_connect_menu_events(self, bus, menu, subject):
-        subject.activate()
-
+    def test_connect_menu_events(self, bus, menu, plugin):
         menu.connect.assert_called_once_with(bus)
 
 
 class TestDeactivatePlugin:
-    def test_unregisters_systray_provider(self, subject):
-        graph.register_instance(Systray, subject)
-        subject.activate()
+    def test_unregisters_systray_provider(self, plugin):
+        graph.register_instance(Systray, plugin)
+        plugin.activate()
 
-        subject.deactivate()
+        plugin.deactivate()
 
         assert Systray not in graph.providers.keys()
 
-    def test_hide(self, subject):
-        subject.activate()
-        subject.status_icon.set_visible(True)
+    def test_hide(self, plugin):
+        plugin.activate()
+        plugin.status_icon.props.visible = True
 
-        subject.deactivate()
+        plugin.deactivate()
 
-        assert subject.status_icon.get_visible() is False
+        assert plugin.status_icon.props.visible is False
 
-    def test_disconnects_menu_events(self, bus, menu, subject):
-        subject.activate()
-
-        subject.deactivate()
+    def test_disconnects_menu_events(self, bus, menu, plugin):
+        plugin.disconnect(bus)
 
         menu.disconnect.assert_called_once_with(bus)
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
-def test_shows_menu_when_clicked(event, params, subject, menu):
-    subject.status_icon.emit(event, *params)
+def test_shows_menu_when_clicked(event, params, plugin, menu):
+    plugin.status_icon.emit(event, *params)
 
     menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
