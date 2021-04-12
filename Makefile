@@ -54,20 +54,9 @@ release-%:
 trigger-build:
 	curl -X POST -H "Authorization: Token $(TOKEN)" $(OBS_API_URL)
 
-.PHONY: docker-clean
-docker-clean:
-	docker rmi $(DOCKER_IMAGE) 2> /dev/null || echo $(DOCKER_IMAGE) not found!
-
-PHONY: docker-pull
-docker-pull:
-	docker pull $(DOCKER_IMAGE)
-
 .PHONY: docker-test
 docker-test:
 	docker run --rm -v $(CURDIR):$(WORKDIR) --workdir $(WORKDIR) $(DOCKER_IMAGE)
-
-.PHONY: docker-all
-docker-all: docker-clean docker-pull docker-test
 
 .PHONY: docker-enter
 docker-enter:
