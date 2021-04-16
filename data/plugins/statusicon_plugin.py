@@ -22,10 +22,12 @@ class StatusIconPlugin(plugin.Plugin):
         self.status_icon = self.create_widget()
 
     def connect(self, bus: Bus) -> None:
+        logger.debug("action=connect")
         super().connect(bus)
         self.menu.connect(bus)
 
     def disconnect(self, bus: Bus) -> None:
+        logger.debug("action=disconnect")
         self.menu.disconnect(bus)
         super().disconnect(bus)
 
