@@ -1,6 +1,7 @@
 import logging
 
 import gi
+from wiring import Graph
 
 gi.require_version("Gtk", "3.0")
 
@@ -8,7 +9,7 @@ from gi.repository import Gtk
 
 import tomate.pomodoro.plugin as plugin
 from tomate.ui import Systray
-from tomate.pomodoro import Bus, TimerPayload, suppress_errors, graph, Events, on
+from tomate.pomodoro import Bus, TimerPayload, suppress_errors, Events, on
 
 logger = logging.getLogger(__name__)
 
@@ -17,25 +18,20 @@ class StatusIconPlugin(plugin.Plugin):
     @suppress_errors
     def __init__(self):
         super().__init__()
-        self.menu = graph.get("tomate.ui.systray.menu")
-        self.session = graph.get("tomate.session")
+        self.menu = None
+        self.session = None
         self.status_icon = self.create_widget()
 
-    def connect(self, bus: Bus) -> None:
-        logger.debug("action=connect")
-        super().connect(bus)
-        self.menu.connect(bus)
-
-    def disconnect(self, bus: Bus) -> None:
-        logger.debug("action=disconnect")
-        self.menu.disconnect(bus)
-        super().disconnect(bus)
+    def configure(self, bus: Bus, graph: Graph) -> None:
+        super().configure(bus, graph)
+        self.menu = graph.get("tomate.ui.systray.menu")
+        self.session = graph.get("tomate.session")
 
     @suppress_errors
     def activate(self):
         super().activate()
-        graph.register_instance(Systray, self)
-
+        self.menu.connect(self.bus)
+        self.graph.register_instance(Systray, self)
         if self.session.is_running():
             self.show()
         else:
@@ -44,7 +40,8 @@ class StatusIconPlugin(plugin.Plugin):
     @suppress_errors
     def deactivate(self):
         super().deactivate()
-        graph.unregister_provider(Systray)
+        self.menu.disconnect(self.bus)
+        self.graph.unregister_provider(Systray)
         self.hide()
 
     @suppress_errors

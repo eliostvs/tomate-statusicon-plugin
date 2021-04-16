@@ -1,8 +1,16 @@
 import pytest
 from gi.repository import Gtk
+from wiring import Graph
 
-from tomate.pomodoro import Bus, Events, Session, TimerPayload, graph
+from tomate.pomodoro import Bus, Events, Session, TimerPayload
 from tomate.ui import Systray, SystrayMenu
+
+
+@pytest.fixture
+def graph() -> Graph:
+    g = Graph()
+    g.register_instance(Graph, g)
+    return g
 
 
 @pytest.fixture
@@ -21,7 +29,7 @@ def session(mocker):
 
 
 @pytest.fixture
-def plugin(bus, menu, session):
+def plugin(bus, menu, graph, session):
     from statusicon_plugin import StatusIconPlugin
 
     graph.providers.clear()
@@ -30,7 +38,7 @@ def plugin(bus, menu, session):
     graph.register_instance("tomate.session", session)
 
     instance = StatusIconPlugin()
-    instance.connect(bus)
+    instance.configure(bus, graph)
     return instance
 
 
@@ -87,11 +95,12 @@ def test_hides_when_session_end(event, bus, plugin):
 
 
 class TestActivePlugin:
-    def test_registers_systray_provider(self, plugin):
+    def test_activate(self, bus, graph, menu, plugin):
         plugin.activate()
 
         assert Systray in graph.providers.keys()
         assert graph.get(Systray) == plugin
+        menu.connect.assert_called_once_with(bus)
 
     def test_shows_when_session_is_running(self, session, plugin):
         session.is_running.return_value = True
@@ -109,18 +118,16 @@ class TestActivePlugin:
 
         assert plugin.status_icon.props.visible is False
 
-    def test_connect_menu_events(self, bus, menu, plugin):
-        menu.connect.assert_called_once_with(bus)
-
 
 class TestDeactivatePlugin:
-    def test_unregisters_systray_provider(self, plugin):
+    def test_deactivate(self, bus, graph, menu, plugin):
         graph.register_instance(Systray, plugin)
         plugin.activate()
 
         plugin.deactivate()
 
         assert Systray not in graph.providers.keys()
+        menu.disconnect.assert_called_once_with(bus)
 
     def test_hide(self, plugin):
         plugin.activate()
@@ -129,11 +136,6 @@ class TestDeactivatePlugin:
         plugin.deactivate()
 
         assert plugin.status_icon.props.visible is False
-
-    def test_disconnects_menu_events(self, bus, menu, plugin):
-        plugin.disconnect(bus)
-
-        menu.disconnect.assert_called_once_with(bus)
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
