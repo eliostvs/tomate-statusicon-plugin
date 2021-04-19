@@ -1,92 +1,80 @@
 import logging
 
-from gi.repository import Gtk
-from wiring import implements
+import gi
+from wiring import Graph
 
-import tomate.plugin
-from tomate.constant import State
-from tomate.event import connect_events, disconnect_events, Events, on
-from tomate.graph import graph
-from tomate.timer import TimerPayload
-from tomate.utils import rounded_percent, suppress_errors
-from tomate.view import TrayIcon
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+
+import tomate.pomodoro.plugin as plugin
+from tomate.ui import Systray
+from tomate.pomodoro import Bus, TimerPayload, suppress_errors, Events, on
 
 logger = logging.getLogger(__name__)
 
 
-@implements(TrayIcon)
-class StatusIconPlugin(tomate.plugin.Plugin):
+class StatusIconPlugin(plugin.Plugin):
     @suppress_errors
     def __init__(self):
-        super(StatusIconPlugin, self).__init__()
+        super().__init__()
+        self.menu = None
+        self.session = None
+        self.status_icon = self.create_widget()
 
-        self.menu = graph.get("trayicon.menu")
+    def configure(self, bus: Bus, graph: Graph) -> None:
+        super().configure(bus, graph)
+        self.menu = graph.get("tomate.ui.systray.menu")
         self.session = graph.get("tomate.session")
-        self.widget = self.build_widget()
 
     @suppress_errors
     def activate(self):
-        super(StatusIconPlugin, self).activate()
-
-        graph.register_instance(TrayIcon, self)
-        connect_events(self.menu)
-
-        self._show_if_session_is_running()
+        super().activate()
+        self.menu.connect(self.bus)
+        self.graph.register_instance(Systray, self)
+        if self.session.is_running():
+            self.show()
+        else:
+            self.hide()
 
     @suppress_errors
     def deactivate(self):
-        super(StatusIconPlugin, self).deactivate()
-
-        graph.unregister_provider(TrayIcon)
-        disconnect_events(self.menu)
-
+        super().deactivate()
+        self.menu.disconnect(self.bus)
+        self.graph.unregister_provider(Systray)
         self.hide()
 
     @suppress_errors
-    @on(Events.Session, [State.started])
-    def show(self, *ars, **kwargs):
-        self.widget.set_visible(True)
-
-        logger.debug("Plugin status icon is showing")
-
-    @suppress_errors
-    @on(Events.Session, [State.finished, State.stopped])
-    def hide(self, *args, **kwargs):
-        self.widget.set_visible(False)
-        self.widget.set_from_icon_name("tomate-idle")
-
-        logger.debug("Plugin status icon is hiding")
+    @on(Events.SESSION_START)
+    def show(self, *_, **__):
+        logger.debug("action=show")
+        self.status_icon.props.visible = True
 
     @suppress_errors
-    @on(Events.Timer, [State.changed])
+    @on(Events.SESSION_END, Events.SESSION_INTERRUPT)
+    def hide(self, *_, **__):
+        logger.debug("action=hide")
+        self.status_icon.props.visible = False
+        self.status_icon.set_from_icon_name("tomate-idle")
+
+    @suppress_errors
+    @on(Events.TIMER_UPDATE)
     def update_icon(self, _, payload: TimerPayload):
-        percent = int(payload.ratio * 100)
-
-        if rounded_percent(percent) < 99:
-            icon_name = self._icon_name_for(percent)
-            self.widget.set_from_icon_name(icon_name)
-
-            logger.debug("set icon %s", icon_name)
-
-    def build_widget(self):
-        widget = Gtk.StatusIcon(visible=False)
-        widget.set_from_icon_name("tomate-idle")
-        widget.set_title("StatusIcon")
-        widget.connect("button-press-event", self._popup_menu)
-        widget.connect("popup-menu", self._popup_menu)
-
-        return widget
-
-    def _popup_menu(self, widget, event_or_button, active_time):
-        self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        icon_name = self.icon_name(payload.elapsed_percent)
+        self.status_icon.set_from_icon_name(icon_name)
+        logger.debug("action=set_icon name=%s", icon_name)
 
     @staticmethod
-    def _icon_name_for(percent):
-        return "tomate-{0:02}".format(rounded_percent(percent))
+    def icon_name(percent):
+        return "tomate-{:02.0f}".format(percent)
 
-    def _show_if_session_is_running(self):
-        if self.session.is_running():
-            self.show()
+    def create_widget(self):
+        widget = Gtk.StatusIcon(visible=False)
+        widget.set_from_icon_name("tomate-idle")
+        widget.props.title = "TomateStatusIcon"
+        widget.connect("button-press-event", self.show_popup_menu)
+        widget.connect("popup-menu", self.show_popup_menu)
+        return widget
 
-        else:
-            self.hide()
+    def show_popup_menu(self, *_):
+        self.menu.widget.popup(None, None, None, None, 0, Gtk.get_current_event_time())
