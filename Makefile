@@ -4,11 +4,11 @@ endif
 
 .DELETE_ON_ERROR:
 .ONESHELL:
-.SHELLFLAGS   := -eu -o pipefail -c
+.SHELLFLAGS  := -eu -o pipefail -c
 .SILENT:
-MAKEFLAGS     += --no-builtin-rules
-MAKEFLAGS     += --warn-undefined-variables
-SHELL         = bash
+MAKEFLAGS    += --no-builtin-rules
+MAKEFLAGS    += --warn-undefined-variables
+SHELL        = bash
 
 DEBUG        = TOMATE_DEBUG=1
 DOCKER_IMAGE = eliostvs/tomate
