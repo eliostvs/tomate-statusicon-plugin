@@ -71,27 +71,27 @@ def test_changes_icon_when_timer_change(time_left, duration, icon_name, bus, plu
 
     bus.send(Events.TIMER_UPDATE, payload=TimerPayload(time_left=time_left, duration=duration))
 
-    assert plugin.status_icon.props.icon_name == icon_name
+    assert plugin.widget.props.icon_name == icon_name
 
 
 def test_shows_when_session_start(bus, plugin):
     plugin.activate()
-    plugin.status_icon.props.visible = False
+    plugin.widget.props.visible = False
 
     bus.send(Events.SESSION_START)
 
-    assert plugin.status_icon.props.visible is True
+    assert plugin.widget.props.visible is True
 
 
 @pytest.mark.parametrize("event", [Events.SESSION_END, Events.SESSION_INTERRUPT])
 def test_hides_when_session_end(event, bus, plugin):
     plugin.activate()
-    plugin.status_icon.props.visible = True
+    plugin.widget.props.visible = True
 
     bus.send(event)
 
-    assert plugin.status_icon.props.visible is False
-    assert plugin.status_icon.props.icon_name == "tomate-idle"
+    assert plugin.widget.props.visible is False
+    assert plugin.widget.props.icon_name == "tomate-idle"
 
 
 class TestActivePlugin:
@@ -104,19 +104,19 @@ class TestActivePlugin:
 
     def test_shows_when_session_is_running(self, session, plugin):
         session.is_running.return_value = True
-        plugin.status_icon.props.visible = False
+        plugin.widget.props.visible = False
 
         plugin.activate()
 
-        assert plugin.status_icon.props.visible is True
+        assert plugin.widget.props.visible is True
 
     def test_hides_when_session_is_not_running(self, session, plugin):
         session.is_running.return_value = False
-        plugin.status_icon.props.visible = False
+        plugin.widget.props.visible = False
 
         plugin.activate()
 
-        assert plugin.status_icon.props.visible is False
+        assert plugin.widget.props.visible is False
 
 
 class TestDeactivatePlugin:
@@ -131,15 +131,15 @@ class TestDeactivatePlugin:
 
     def test_hide(self, plugin):
         plugin.activate()
-        plugin.status_icon.props.visible = True
+        plugin.widget.props.visible = True
 
         plugin.deactivate()
 
-        assert plugin.status_icon.props.visible is False
+        assert plugin.widget.props.visible is False
 
 
 @pytest.mark.parametrize("event, params", [("button-press-event", [None]), ("popup-menu", [0, 0])])
 def test_shows_menu_when_clicked(event, params, plugin, menu):
-    plugin.status_icon.emit(event, *params)
+    plugin.widget.emit(event, *params)
 
     menu.widget.popup.assert_called_once_with(None, None, None, None, 0, 0)
