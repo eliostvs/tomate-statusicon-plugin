@@ -48,4 +48,5 @@ setup(
     url="https://github.com/eliostvs/tomate-statusicon-plugin",
     version="0.8.0",
     zip_safe=False,
+    py_modules=[],
 )
